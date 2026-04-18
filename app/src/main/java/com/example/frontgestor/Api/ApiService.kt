@@ -1,7 +1,8 @@
 package com.example.frontgestor.Api
 
+import com.example.frontgestor.Modelos.Empresa
 import com.example.frontgestor.Modelos.Trabajador
-import com.example.frontgestor.modelosDTO.LoginDTO
+import com.example.frontgestor.Modelos.LoginDTO
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -18,11 +19,14 @@ interface ApiService {
     @GET("trabajador/listar/{idEmpresa}")
     suspend fun listarTrabajadores(@Path("idEmpresa") idEmpresa: Int): List<Trabajador>
 
+    @POST("empresa/login")
+    suspend fun loginEmpresa(@Body login: LoginDTO): Empresa
+
     companion object {
         private var apiService: ApiService? = null
 
         // IMPORTANTE: Android NO usa localhost → usa 10.0.2.2
-        private const val BASE_URL = "http://10.0.2.2:8096/res/"
+        private const val BASE_URL = "http://192.168.0.17:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

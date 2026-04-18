@@ -28,24 +28,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.frontgestor.Api.LoginViewModel
+import com.example.frontgestor.Modelos.Empresa
+import com.example.frontgestor.Modelos.Trabajador
 import com.example.frontgestor.R
+import com.example.frontgestor.SessionManager
+
+
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen( modifier: Modifier = Modifier ,
+    viewModel : LoginViewModel,
+    onLoginSuccess: () -> Unit
+) {
     var isEmpresa by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val session = remember { SessionManager(context) }
+
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize().background(Color.White)
     ){
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(4.dp)
+                .padding(8.dp)
                 .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -140,7 +152,20 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { /* login */ },
+                onClick = {
+                    viewModel.login(email, password, isEmpresa) { result ->
+
+                        if (isEmpresa) {
+                            val empresa = result as Empresa
+                            session.saveUser(empresa.id_Empresa, "empresa")
+                        } else {
+                            val trabajador = result as Trabajador
+                            session.saveUser(trabajador.idTrabajador, "trabajador")
+                        }
+
+                        onLoginSuccess()
+                    }
+                },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(id = R.color.personalizadoVerdoso),
@@ -149,6 +174,12 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             ) {
                 Text("Iniciar sesión")
             }
+
+            viewModel.errorMessage?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(it, color = Color.Red)
+            }
+
         }
     }
 }
