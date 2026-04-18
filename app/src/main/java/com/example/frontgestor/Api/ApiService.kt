@@ -22,7 +22,7 @@ interface ApiService {
         private var apiService: ApiService? = null
 
         // IMPORTANTE: Android NO usa localhost → usa 10.0.2.2
-        private const val BASE_URL = "http://127.0.0.1:8096/web/"
+        private const val BASE_URL = "http://10.0.2.2:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {
