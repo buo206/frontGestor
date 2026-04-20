@@ -11,11 +11,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
-    // LOGIN TRABAJADOR
     @POST("trabajador/login")
     suspend fun loginTrabajador(@Body login: LoginDTO): Trabajador
 
-    // LISTAR TRABAJADORES POR EMPRESA
     @GET("trabajador/listar/{idEmpresa}")
     suspend fun listarTrabajadores(@Path("idEmpresa") idEmpresa: Int): List<Trabajador>
 
@@ -25,8 +23,7 @@ interface ApiService {
     companion object {
         private var apiService: ApiService? = null
 
-        // IMPORTANTE: Android NO usa localhost → usa 10.0.2.2
-        private const val BASE_URL = "http://192.168.0.15:8096/res/"
+        private const val BASE_URL = "http://192.168.102.20:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

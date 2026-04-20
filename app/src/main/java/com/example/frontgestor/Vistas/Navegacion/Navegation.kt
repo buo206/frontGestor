@@ -12,6 +12,7 @@ import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
+import com.example.frontgestor.Vistas.Trabajador.MenuTrabajador
 
 
 @Composable
@@ -19,7 +20,11 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
     val navController = rememberNavController()
     val viewModel: LoginViewModel = viewModel()
     val rutaPrimera = if (sesion.isLogged()) {
-            AppDestination.MenuMainE.route
+            if(sesion.getTipo().equals("empresa")){
+               AppDestination.MenuMainE.route
+            }else{
+                AppDestination.MenuTrabajador.route
+            }
         } else {
             AppDestination.Logueo.route
         }
@@ -39,20 +44,34 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 onNavigateToMenu = {
                     if(sesion.getTipo().equals("empresa")){
                         navController.navigate(AppDestination.MenuMainE.route)
+                    }else{
+                        navController.navigate(AppDestination.MenuTrabajador.route)
                     }
                 }
             )
         }
 
+
+        //empresa
+
         composable(route = AppDestination.MenuMainE.route) {
             MenuMainE(modifier ,
                 {} ,
-                sesion
+                sesion ,
+                {
+                    navController.popBackStack()
+                }
             )
         }
 
         composable(route = AppDestination.ListaTrabajadores.route) {
-            // Tu vista de ListaTrabajadores()
+            // vista de ListaTrabajadores()
+        }
+
+        //trabajador
+
+        composable(route = AppDestination.MenuTrabajador.route){
+            MenuTrabajador(modifier)
         }
     }
 }

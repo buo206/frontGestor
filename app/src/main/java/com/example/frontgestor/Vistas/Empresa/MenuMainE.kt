@@ -32,7 +32,8 @@ import com.example.frontgestor.SessionManager
 @Composable
 fun MenuMainE(modifier: Modifier = Modifier,
     onNavegationToLista: () -> Unit ,
-    sesion : SessionManager
+    sesion : SessionManager ,
+    onBack : () -> Unit
 ){
     Box(modifier = modifier.background(Color.White)){
         Column(
@@ -112,7 +113,10 @@ fun MenuMainE(modifier: Modifier = Modifier,
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedButton(
-                onClick = {sesion.logout() },
+                onClick = {
+                    sesion.logout()
+                    onBack()
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Cerrar sesión")

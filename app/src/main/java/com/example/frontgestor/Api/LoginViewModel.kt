@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.LoginDTO
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class LoginViewModel : ViewModel() {
 
@@ -31,8 +32,10 @@ class LoginViewModel : ViewModel() {
 
                 onSuccess(result)
 
-            } catch (e: Exception) {
-                errorMessage = e.message
+            } catch (e: HttpException) {
+                if(e.code()== 400){
+                    errorMessage = "Contraseña o email incorrecto"
+                }
             } finally {
                 loading = false
             }
