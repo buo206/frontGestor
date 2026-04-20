@@ -44,7 +44,8 @@ import com.example.frontgestor.SessionManager
 @Composable
 fun LoginScreen( modifier: Modifier = Modifier ,
     viewModel : LoginViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit ,
+    onNavigateToMenu: () -> Unit
 ) {
     var isEmpresa by remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -157,13 +158,14 @@ fun LoginScreen( modifier: Modifier = Modifier ,
 
                         if (isEmpresa) {
                             val empresa = result as Empresa
-                            session.saveUser(empresa.id_Empresa, "empresa")
+                            session.saveUser(empresa.id_Empresa , 0, "empresa")
                         } else {
                             val trabajador = result as Trabajador
-                            session.saveUser(trabajador.idTrabajador, "trabajador")
+                            session.saveUser(trabajador.idEmpresa , trabajador.idTrabajador, "trabajador")
                         }
 
                         onLoginSuccess()
+                        onNavigateToMenu()
                     }
                 },
                 modifier = Modifier.fillMaxWidth() ,

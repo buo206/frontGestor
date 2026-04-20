@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.Vistas.LoginScreen
+import com.example.frontgestor.Vistas.Navegacion.Navegation
 import com.example.frontgestor.ui.theme.FrontGestorTheme
 import kotlin.getValue
 
@@ -35,18 +36,7 @@ class MainActivity : ComponentActivity() {
             FrontGestorTheme {
                 val session = SessionManager(this)
                 Scaffold(modifier = Modifier.fillMaxSize().background(Color.White)) { innerPadding ->
-                    val viewModel: LoginViewModel by viewModels()
-                    if (session.isLogged()) {
-                        Greeting("pepe" ,modifier = Modifier.padding(innerPadding))
-                    } else {
-                        LoginScreen(modifier = Modifier.padding(innerPadding) ,
-                            viewModel ,
-                            {
-
-                            }
-                        )
-                    }
-
+                    Navegation(modifier = Modifier.padding(innerPadding) , session)
                 }
             }
         }
