@@ -23,6 +23,10 @@ class EmpresaViewModel : ViewModel() {
     var trabajadores by mutableStateOf<List<TrabajadorListaDTO>?>(null)
         private set
 
+    var trabajadorBuscado by mutableStateOf<TrabajadorDTO?>(null)
+        private set
+
+
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
             cargando = true
@@ -34,6 +38,23 @@ class EmpresaViewModel : ViewModel() {
             }else{
                 if(result.code()== 400){
                     mensageError = "No existe una empresa con esta id"
+                }
+            }
+            cargando = false
+        }
+    }
+
+    fun buscarTrabajador(id : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarTrabajador(id)
+            if(result.isSuccessful){
+                trabajadorBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una un trabajador con esta id"
                 }
             }
             cargando = false
@@ -56,4 +77,5 @@ class EmpresaViewModel : ViewModel() {
             cargando = false
         }
     }
+
 }

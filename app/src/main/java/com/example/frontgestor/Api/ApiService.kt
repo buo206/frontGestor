@@ -13,17 +13,25 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
+    //logins
     @POST("empresa/login")
     suspend fun loginEmpresa(@Body loginDto: LoginDTO): Response<EmpresaDTO>
 
     @POST("trabajador/login")
     suspend fun loginTrabajador(@Body loginDto: LoginDTO): Response<TrabajadorDTO>
 
+
+    //listas
     @GET("trabajador/listar/{idEmpresa}")
     suspend fun listarTrabajadores(@Path("idEmpresa") id: Int): Response<List<TrabajadorListaDTO>>
 
+
+    //busquedas por id
     @GET("empresa/buscar/{id}")
     suspend fun buscarEmpresa(@Path("id") id: Int): Response<EmpresaDTO>
+
+    @GET("trabajador/buscar/{id}")
+    suspend fun buscarTrabajador(@Path("id") id: Int): Response<TrabajadorDTO>
 
 
     companion object {
