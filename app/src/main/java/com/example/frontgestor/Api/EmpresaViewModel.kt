@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.EmpresaDTO
+import com.example.frontgestor.Modelos.TrabajadorDTO
+import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -18,21 +20,40 @@ class EmpresaViewModel : ViewModel() {
     var empresa by mutableStateOf<EmpresaDTO?>(null)
         private set
 
+    var trabajadores by mutableStateOf<List<TrabajadorListaDTO>?>(null)
+        private set
+
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
-            try {
-                cargando = true
-                mensageError = null
+            cargando = true
+            mensageError = null
 
-                var result = api.buscarEmpresa(id)
-                empresa = result
-            }catch (e: HttpException) {
-                if(e.code()== 400){
+            var result = api.buscarEmpresa(id)
+            if(result.isSuccessful){
+                empresa = result.body()
+            }else{
+                if(result.code()== 400){
                     mensageError = "No existe una empresa con esta id"
                 }
-            } finally {
-                cargando = false
             }
+            cargando = false
+        }
+    }
+
+    fun listarTrabajadores(empresaId : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.listarTrabajadores(empresaId)
+            if(result.isSuccessful){
+                trabajadores = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una empresa con esta id"
+                }
+            }
+            cargando = false
         }
     }
 }

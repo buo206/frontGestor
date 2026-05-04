@@ -3,6 +3,7 @@ package com.example.frontgestor.Api
 import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.LoginDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
+import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,16 +14,17 @@ import retrofit2.http.Path
 
 interface ApiService {
     @POST("empresa/login")
-    suspend fun loginEmpresa(@Body loginDto: LoginDTO): EmpresaDTO
+    suspend fun loginEmpresa(@Body loginDto: LoginDTO): Response<EmpresaDTO>
 
     @POST("trabajador/login")
-    suspend fun loginTrabajador(@Body loginDto: LoginDTO): TrabajadorDTO
+    suspend fun loginTrabajador(@Body loginDto: LoginDTO): Response<TrabajadorDTO>
 
     @GET("trabajador/listar/{idEmpresa}")
-    suspend fun listarTrabajadores(@Path("idEmpresa") id: Int): List<TrabajadorDTO>
+    suspend fun listarTrabajadores(@Path("idEmpresa") id: Int): Response<List<TrabajadorListaDTO>>
 
     @GET("empresa/buscar/{id}")
-    suspend fun buscarEmpresa(@Path("id") id: Int): EmpresaDTO
+    suspend fun buscarEmpresa(@Path("id") id: Int): Response<EmpresaDTO>
+
 
     companion object {
         private var apiService: ApiService? = null

@@ -25,33 +25,35 @@ class LoginViewModel : ViewModel() {
         private set
 
 
-    fun login(email: String, password: String, isEmpresa: Boolean, onSuccess: (Any) -> Unit) {
+    fun login(email: String, password: String, isEmpresa: Boolean, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            try {
-                cargando = true
-                mensageError = null
-
-                val loginDTO = LoginDTO(email, password)
-
-                val result = if (isEmpresa) {
-                    val res = api.loginEmpresa(loginDTO)
-                    empresa = res
-                    res
-                } else {
-                    val res = api.loginTrabajador(loginDTO)
-                    trabajador = res
-                    res
+            cargando = true
+            mensageError = null
+            val loginDTO = LoginDTO(email, password)
+            if (isEmpresa){
+                val respuesta = api.loginEmpresa(loginDTO)
+                empresa = respuesta.body()
+                if(! respuesta.isSuccessful){
+                    if(respuesta.code()== 400){
+                        mensageError = "Contraseña o email incorrecto"
+                    }else{
+                        mensageError = respuesta.message()
+                    }
+                }
+            } else {
+                val respuesta = api.loginTrabajador(loginDTO)
+                trabajador = respuesta.body()
+                if(! respuesta.isSuccessful){
+                    if(respuesta.code()== 400){
+                        mensageError = "Contraseña o email incorrecto"
+                    }else{
+                        mensageError = respuesta.message()
+                    }
                 }
 
-                onSuccess(result)
-
-            } catch (e: HttpException) {
-                if(e.code()== 400){
-                    mensageError = "Contraseña o email incorrecto"
-                }
-            } finally {
-                cargando = false
             }
+            onSuccess()
+            cargando = false
         }
     }
 }

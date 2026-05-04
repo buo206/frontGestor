@@ -153,18 +153,21 @@ fun LoginScreen( modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    viewModel.login(email, password, isEmpresa) { result ->
+                    viewModel.login(email, password, isEmpresa) {
 
-                        if (isEmpresa) {
-                            val empresa = result as EmpresaDTO
-                            session.saveUser(empresa.id_Empresa , 0, "empresa")
-                        } else {
-                            val trabajador = result as TrabajadorDTO
-                            session.saveUser(trabajador.idEmpresa , trabajador.idTrabajador, "trabajador")
+                        if(viewModel.empresa != null){
+                            if (isEmpresa) {
+                                val idEmpresa = viewModel.empresa?.idEmpresa ?: 0
+                                session.saveUser(idEmpresa , 0, "empresa")
+                            } else {
+                                val idTrabajador = viewModel.trabajador?.idTrabajador ?: 0
+                                val idEmpresa = viewModel.trabajador?.idEmpresa ?: 0
+                                session.saveUser(idEmpresa , idTrabajador, "trabajador")
+                            }
+
+                            onLoginSuccess()
+                            onNavigateToMenu()
                         }
-
-                        onLoginSuccess()
-                        onNavigateToMenu()
                     }
                 },
                 modifier = Modifier.fillMaxWidth() ,

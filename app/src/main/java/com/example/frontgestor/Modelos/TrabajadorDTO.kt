@@ -10,6 +10,6 @@ data class TrabajadorDTO(
     val numeroTelefono: String?,
     val dni: String?,
     val dirreccion: String?,
-    val fecha_Creacion: String
+    val fechaCreacion: String
 )
 

@@ -19,7 +19,7 @@ class SessionManager(context: Context) {
 
     fun getUserId(): Int = prefs.getInt("id", -1)
 
-    fun getEmpresaId(): Int = prefs.getInt("idEmpresa", -1)
+    fun getEmpresaId(): Int = prefs.getInt("idEmpresa", 0)
 
     fun getTipo(): String? = prefs.getString("tipo", null)
 
