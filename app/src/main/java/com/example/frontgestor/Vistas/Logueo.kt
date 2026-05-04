@@ -2,7 +2,6 @@ package com.example.frontgestor.Vistas
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +30,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.frontgestor.Api.LoginViewModel
-import com.example.frontgestor.Modelos.Empresa
-import com.example.frontgestor.Modelos.Trabajador
+import com.example.frontgestor.Modelos.EmpresaDTO
+import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 
@@ -53,7 +50,9 @@ fun LoginScreen( modifier: Modifier = Modifier ,
 
 
     Box(
-        modifier = modifier.fillMaxSize().background(Color.White)
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White)
     ){
         Column(
             modifier = Modifier
@@ -157,10 +156,10 @@ fun LoginScreen( modifier: Modifier = Modifier ,
                     viewModel.login(email, password, isEmpresa) { result ->
 
                         if (isEmpresa) {
-                            val empresa = result as Empresa
+                            val empresa = result as EmpresaDTO
                             session.saveUser(empresa.id_Empresa , 0, "empresa")
                         } else {
-                            val trabajador = result as Trabajador
+                            val trabajador = result as TrabajadorDTO
                             session.saveUser(trabajador.idEmpresa , trabajador.idTrabajador, "trabajador")
                         }
 
@@ -177,7 +176,7 @@ fun LoginScreen( modifier: Modifier = Modifier ,
                 Text("Iniciar sesión")
             }
 
-            viewModel.errorMessage?.let {
+            viewModel.mensageError?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(it, color = Color.Red)
             }

@@ -22,10 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 
@@ -33,8 +35,10 @@ import com.example.frontgestor.SessionManager
 fun MenuMainE(modifier: Modifier = Modifier,
     onNavegationToLista: () -> Unit ,
     sesion : SessionManager ,
+    empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit
 ){
+    empresaViewModel.bucarEmpresa(sesion.getEmpresaId())
     Box(modifier = modifier.background(Color.White)){
         Column(
             modifier = Modifier
@@ -51,14 +55,14 @@ fun MenuMainE(modifier: Modifier = Modifier,
                 modifier = Modifier
                     .size(120.dp)
                     .clip(RoundedCornerShape(60.dp))
-                    .border(2.dp, Color.Black, RoundedCornerShape(60.dp))
+                    .border(2.dp, Color.Green, RoundedCornerShape(60.dp))
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Nombre empresa
             Text(
-                text = "Nombre Empresa",
+                text = "Nombre : ",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -69,39 +73,27 @@ fun MenuMainE(modifier: Modifier = Modifier,
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(4.dp)
+                elevation = CardDefaults.cardElevation(4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(R.color.personalizadoVerdoso),
+                    contentColor = colorResource(R.color.white)
+                )
+
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    Text("Correo: empresa@email.com")
+                    Text("Correo : ${empresaViewModel.empresa?.email ?: "No disponible"} ")
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text("Teléfono: +34 123 456 789")
+                    Text("Apellidos : ${empresaViewModel.empresa?.apellidos ?: "No disponible"} ")
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text("Ubicación: Madrid, España")
+                    Text("Ubicación: ")
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Descripción
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Descripción",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text("Aquí va la descripción de la empresa...")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = { /* editar perfil */ },

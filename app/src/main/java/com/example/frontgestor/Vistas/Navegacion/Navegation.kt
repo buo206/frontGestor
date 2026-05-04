@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
@@ -18,7 +19,8 @@ import com.example.frontgestor.Vistas.Trabajador.MenuTrabajador
 @Composable
 fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
     val navController = rememberNavController()
-    val viewModel: LoginViewModel = viewModel()
+    val loginviewModel: LoginViewModel = viewModel()
+    val empresaViewModel: EmpresaViewModel = viewModel()
     val rutaPrimera = if (sesion.isLogged()) {
             if(sesion.getTipo().equals("empresa")){
                AppDestination.MenuMainE.route
@@ -37,7 +39,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
     ){
         composable(route = AppDestination.Logueo.route){
             LoginScreen(modifier = modifier,
-                viewModel ,
+                loginviewModel ,
                 {
 
                 } ,
@@ -58,8 +60,10 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
             MenuMainE(modifier ,
                 {} ,
                 sesion ,
+                empresaViewModel ,
                 {
                     navController.popBackStack()
+
                 }
             )
         }
