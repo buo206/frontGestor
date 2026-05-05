@@ -61,6 +61,11 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun limpiarTrabajador(){
+        if(cargando != true){
+            trabajadorBuscado = null
+        }
+    }
     fun listarTrabajadores(empresaId : Int){
         viewModelScope.launch {
             cargando = true

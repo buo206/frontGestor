@@ -222,18 +222,8 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-                                empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
-                                if(empresaViewModel.trabajadorBuscado != null){
+                                    empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
                                     onDetalle()
-                                }else{
-                                    empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
-                                    lanzador.launch {
-                                        snackbarEstado.showSnackbar(
-                                            message = "No se ha encontrado ningun trabajador con esta id , se recargara la lista ",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                }
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
