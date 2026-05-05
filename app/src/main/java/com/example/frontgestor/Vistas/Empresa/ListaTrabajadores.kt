@@ -67,7 +67,8 @@ import kotlinx.coroutines.launch
 fun ListaTrabajadores(modifier: Modifier = Modifier ,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
-    onBack : () -> Unit
+    onBack : () -> Unit ,
+    onDetalle:() -> Unit
 ){
     //variables del navigationBar
     var selectedItem by remember { mutableStateOf(1) }
@@ -219,7 +220,21 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                             colors = CardDefaults.cardColors(
                                 containerColor = colorResource(R.color.personalizadoVerdoso),
                                 contentColor = Color.White
-                            )
+                            ) ,
+                            onClick = {
+                                empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
+                                if(empresaViewModel.trabajadorBuscado != null){
+                                    onDetalle()
+                                }else{
+                                    empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+                                    lanzador.launch {
+                                        snackbarEstado.showSnackbar(
+                                            message = "No se ha encontrado ningun trabajador con esta id , se recargara la lista ",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                }
+                            }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row {

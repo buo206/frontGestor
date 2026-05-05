@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
+import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
@@ -78,6 +79,19 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.popBackStack()
                     navController.navigate(AppDestination.MenuMainE.route)
+                },
+                {
+                    navController.navigate(AppDestination.DetalleTrabajador.route)
+                }
+            )
+        }
+
+        composable(route = AppDestination.DetalleTrabajador.route){
+            DetalleTrabajador(modifier ,
+                empresaViewModel ,
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.ListaTrabajadores.route)
                 }
             )
         }
