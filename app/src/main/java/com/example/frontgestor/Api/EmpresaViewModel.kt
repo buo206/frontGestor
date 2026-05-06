@@ -83,4 +83,21 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun editarTrabajador(trabajdor : TrabajadorDTO){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.editarTrabajador(trabajdor)
+            if(result.isSuccessful){
+                trabajadorBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                }
+            }
+            cargando = false
+        }
+    }
+
 }

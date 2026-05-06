@@ -62,7 +62,6 @@ fun MenuMainE(modifier: Modifier = Modifier,
 
     //lamamos siempre que se llama a esta pantalla para referescar la infoprmacion
     empresaViewModel.bucarEmpresa(sesion.getEmpresaId())
-
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent ,

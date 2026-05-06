@@ -1,7 +1,7 @@
 package com.example.frontgestor.Modelos
 
 data class TrabajadorDTO(
-    val idTrabajador: Int,
+    val idTrabajador: Int?,
     val idEmpresa: Int ,
     val nombre: String,
     val apellidos: String,

@@ -34,10 +34,14 @@ interface ApiService {
     suspend fun buscarTrabajador(@Path("id") id: Int): Response<TrabajadorDTO>
 
 
+    //editar o altas
+    @POST("trabajador/editar")
+    suspend fun editarTrabajador(@Body trabajador: TrabajadorDTO): Response<TrabajadorDTO>
+
     companion object {
         private var apiService: ApiService? = null
 
-        private const val BASE_URL = "http://192.168.102.20:8096/res/"
+        private const val BASE_URL = "http://192.168.0.65:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

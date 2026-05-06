@@ -11,6 +11,8 @@ sealed class AppDestination(val route: String) {
 
     data object DetalleTrabajador : AppDestination("detalletrabajador")
 
+    data object FormularioTrabajador : AppDestination("formulariotrabajador")
+
 
     //vista trabajador
     data object MenuTrabajador : AppDestination("menutrabajador")

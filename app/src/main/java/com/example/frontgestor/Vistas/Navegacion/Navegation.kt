@@ -1,23 +1,29 @@
 package com.example.frontgestor.Vistas.Navegacion
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
+import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
 import com.example.frontgestor.Vistas.Trabajador.MenuTrabajador
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
     val navController = rememberNavController()
@@ -92,7 +98,26 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.popBackStack()
                     navController.navigate(AppDestination.ListaTrabajadores.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.FormularioTrabajador.route + "/true")
                 }
+            )
+        }
+
+        composable(
+            route = AppDestination.FormularioTrabajador.route + "/{esEdicion}",
+            arguments = listOf(
+                navArgument("esEdicion") { type = NavType.BoolType }
+            )
+        ){ backStackEntry ->
+            val esEdicion = backStackEntry.arguments?.getBoolean("esEdicion") ?: true
+            FormularioTrabajador(modifier, empresaViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion ,
+                esEdicion
             )
         }
 

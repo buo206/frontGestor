@@ -33,7 +33,8 @@ import com.example.frontgestor.R
 @Composable
 fun DetalleTrabajador(modifier: Modifier = Modifier ,
     empresaViewModel: EmpresaViewModel,
-    onBack : () -> Unit
+    onBack : () -> Unit ,
+    onEditar: () ->Unit
 ){
     if(empresaViewModel.trabajadorBuscado == null){
         Box(
@@ -117,7 +118,7 @@ fun DetalleTrabajador(modifier: Modifier = Modifier ,
 
 
             Button(
-                onClick = { /* editar perfil */ },
+                onClick = { onEditar() },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.personalizadoVerdoso),
