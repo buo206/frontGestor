@@ -197,7 +197,7 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
                     contentColor = Color.White
                 )
             ) {
-                Text("Cancelar")
+                Text("Salir")
             }
 
             SnackbarHost(
@@ -218,9 +218,8 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
                         if(esEdicion){
                             empresaViewModel.editarMaterial(material)
                         }else{
-
+                            empresaViewModel.crearMaterial(material)
                         }
-                        onback()
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
@@ -233,7 +232,7 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
                     contentColor = Color.White
                 )
             ) {
-                Text("Guardar y salir")
+                Text("Guardar")
             }
 
 

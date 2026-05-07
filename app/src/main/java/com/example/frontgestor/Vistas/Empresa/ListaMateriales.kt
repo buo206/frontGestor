@@ -54,7 +54,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.R
@@ -64,16 +66,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListaMateriales(modifier: Modifier = Modifier ,
-                      sesion : SessionManager ,
-                      empresaViewModel : EmpresaViewModel ,
-                      onBack : () -> Unit ,
-                      onDetalle:() -> Unit ,
-                      onCrearNuevo : () -> Unit
+    sesion : SessionManager ,
+    empresaViewModel : EmpresaViewModel ,
+    onBack : () -> Unit ,
+    onEditar:() -> Unit ,
+    onCrearNuevo : () -> Unit
+
 ){
     //variables del navigationBar
-    var selectedItem by remember { mutableStateOf(3) }
-    val items = listOf("Info", "Trabajadores", "Tareas","Materiales")
-    val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow , Icons.Filled.Menu)
+    var selectedItem by remember { mutableStateOf(2) }
+    val items = listOf("Info", "Registro","Materiales")
+    val icons = listOf(rememberVectorPainter(Icons.Filled.Info), painterResource(R.drawable.registro), rememberVectorPainter(Icons.Filled.Menu) )
 
     //variable para el snackBar
     val snackbarEstado = remember { SnackbarHostState() }
@@ -127,7 +130,10 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
                             tint = Color(0xFF2BB673)
                         )
                     }
-                    IconButton(onClick = { onCrearNuevo()}) {
+                    IconButton(onClick = {
+                        empresaViewModel.limpiarTrabajador()
+                        onCrearNuevo()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Añadir materiales",
@@ -145,7 +151,13 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
             ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = item) },
+                        icon = {
+                            Icon(
+                                painter = icons[index],
+                                contentDescription = item,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
                         label = { Text(item) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.White,
@@ -226,7 +238,7 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
                             ) ,
                             onClick = {
                                 empresaViewModel.buscarMaterial(material)
-                                onDetalle()
+                                onEditar()
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {

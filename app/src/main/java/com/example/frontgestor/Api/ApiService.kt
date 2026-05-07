@@ -48,6 +48,9 @@ interface ApiService {
     @POST("material/editar")
     suspend fun editarMaterial(@Body material: MaterialDTO): Response<MaterialDTO>
 
+    @POST("material/alta")
+    suspend fun crearMaterial(@Body material: MaterialDTO): Response<MaterialDTO>
+
     companion object {
         private var apiService: ApiService? = null
 

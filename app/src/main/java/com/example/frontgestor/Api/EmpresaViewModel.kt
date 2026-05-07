@@ -67,8 +67,13 @@ class EmpresaViewModel : ViewModel() {
     }
 
     fun limpiarTrabajador(){
-        if(cargando != true){
+        if(cargando == false ){
             trabajadorBuscado = null
+        }
+    }
+    fun limpirarMaterial(){
+        if(cargando == true){
+            materialBuscado = null
         }
     }
     fun listarTrabajadores(empresaId : Int){
@@ -160,6 +165,21 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun crearMaterial(material : MaterialDTO){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
 
+            var result = api.crearMaterial(material)
+            if(result.isSuccessful){
+                materialBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "Algun campo ha rellenado de forma incorrecta o ya exite un material con ese titulo"
+                }
+            }
+            cargando = false
+        }
+    }
 
 }

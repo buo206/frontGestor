@@ -269,7 +269,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                     contentColor = Color.White
                 )
             ) {
-                Text("Cancelar")
+                Text("Salir")
             }
 
             SnackbarHost(
@@ -292,7 +292,6 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                         }else{
                             empresaViewModel.crearTrabajador(trabajador)
                         }
-                        onback()
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
@@ -305,7 +304,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                     contentColor = Color.White
                 )
             ) {
-                Text("Guardar y salir")
+                Text("Guardar")
             }
 
 
