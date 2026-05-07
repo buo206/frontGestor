@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -53,12 +54,13 @@ fun MenuMainE(modifier: Modifier = Modifier,
     onNavegationToLista: () -> Unit ,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
-    onBack : () -> Unit
+    onBack : () -> Unit ,
+    onNavigateToAlmacen : () -> Unit
 ){
     //variables del navigationBar
     var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Info", "Trabajadores", "Tareas")
-    val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow)
+    val items = listOf("Info", "Trabajadores", "Tareas","Almacen")
+    val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow , Icons.Filled.Menu)
 
     //lamamos siempre que se llama a esta pantalla para referescar la infoprmacion
     empresaViewModel.bucarEmpresa(sesion.getEmpresaId())
@@ -89,6 +91,10 @@ fun MenuMainE(modifier: Modifier = Modifier,
                             }
                             if(index == 2){
 
+                            }
+
+                            if(index == 3){
+                                onNavigateToAlmacen()
                             }
 
                         }

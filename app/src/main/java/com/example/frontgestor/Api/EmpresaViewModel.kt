@@ -6,10 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.EmpresaDTO
+import com.example.frontgestor.Modelos.MaterialListaDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class EmpresaViewModel : ViewModel() {
     var cargando by mutableStateOf(false)
@@ -22,6 +22,11 @@ class EmpresaViewModel : ViewModel() {
 
     var trabajadores by mutableStateOf<List<TrabajadorListaDTO>?>(null)
         private set
+
+    var materiales by mutableStateOf<List<MaterialListaDTO>?>(null)
+        private set
+
+    var materialBuscado by mutableStateOf<MaterialListaDTO?>(null)
 
     var trabajadorBuscado by mutableStateOf<TrabajadorDTO?>(null)
         private set
@@ -83,6 +88,23 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun listarMateriales(empresaId : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.listarMateriales(empresaId)
+            if(result.isSuccessful){
+                materiales = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una empresa con esta id"
+                }
+            }
+            cargando = false
+        }
+    }
+
     fun editarTrabajador(trabajdor : TrabajadorDTO){
         viewModelScope.launch {
             cargando = true
@@ -99,5 +121,41 @@ class EmpresaViewModel : ViewModel() {
             cargando = false
         }
     }
+
+    fun editarMaterial(material : MaterialListaDTO){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.editarMaterial(material)
+            if(result.isSuccessful){
+                materialBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                }
+            }
+            cargando = false
+        }
+    }
+
+    fun crearTrabajador(trabajdor : TrabajadorDTO){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.crearTrabajador(trabajdor)
+            if(result.isSuccessful){
+                trabajadorBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                }
+            }
+            cargando = false
+        }
+    }
+
+
 
 }

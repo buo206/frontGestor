@@ -1,6 +1,5 @@
 package com.example.frontgestor.Vistas.Empresa
 
-import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -55,27 +55,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaTrabajadores(modifier: Modifier = Modifier ,
-    sesion : SessionManager ,
-    empresaViewModel : EmpresaViewModel ,
-    onBack : () -> Unit ,
-    onDetalle:() -> Unit ,
-    onCrearNuevo : () -> Unit ,
-    onNavigateToAlmacen : () -> Unit
+fun ListaMateriales(modifier: Modifier = Modifier ,
+                      sesion : SessionManager ,
+                      empresaViewModel : EmpresaViewModel ,
+                      onBack : () -> Unit ,
+                      onDetalle:() -> Unit ,
+                      onCrearNuevo : () -> Unit
 ){
     //variables del navigationBar
-    var selectedItem by remember { mutableStateOf(1) }
-    val items = listOf("Info", "Trabajadores", "Tareas", "Almacen")
+    var selectedItem by remember { mutableStateOf(3) }
+    val items = listOf("Info", "Trabajadores", "Tareas","Materiales")
     val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow , Icons.Filled.Menu)
 
     //variable para el snackBar
@@ -84,12 +81,12 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
     //variable para el buscador
     var textoBusqueda by remember { mutableStateOf("") }
-    val trabajadoresFiltrados = empresaViewModel.trabajadores?.filter {
-        it.nombre?.contains(textoBusqueda, ignoreCase = true) == true
+    val materialesFiltrados = empresaViewModel.materiales?.filter {
+        it.titulo?.contains(textoBusqueda, ignoreCase = true) == true
     }
 
     LaunchedEffect(Unit){
-        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+        empresaViewModel.listarMateriales(sesion.getEmpresaId())
     }
 
     Scaffold(
@@ -116,10 +113,10 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                 ),
                 actions = {
                     IconButton(onClick = {
-                        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+                        empresaViewModel.listarMateriales(sesion.getEmpresaId())
                         lanzador.launch {
                             snackbarEstado.showSnackbar(
-                                message = "Actualizando lista de trabajadores...",
+                                message = "Actualizando lista de Materiales...",
                                 duration = SnackbarDuration.Short
                             )
                         }
@@ -133,7 +130,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                     IconButton(onClick = { onCrearNuevo()}) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Añadir trabajador",
+                            contentDescription = "Añadir materiales",
                             tint = Color(0xFF2BB673)
                         )
                     }
@@ -162,12 +159,13 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                             if(index == 0){
                                 onBack()
                             }
+                            if(index ==1){
+
+                            }
                             if(index == 2){
 
                             }
-                            if(index == 3){
-                                onNavigateToAlmacen()
-                            }
+
                         }
                     )
                 }
@@ -183,7 +181,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
             OutlinedTextField(
                 value = textoBusqueda,
                 onValueChange = { textoBusqueda = it },
-                placeholder = { Text("Buscar trabajador...") },
+                placeholder = { Text("Buscar  Materiales...") },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
@@ -214,7 +212,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(trabajadoresFiltrados ?: emptyList()) { trabajador ->
+                    items(materialesFiltrados ?: emptyList()) { material ->
 
                         Card(
                             modifier = Modifier
@@ -227,8 +225,9 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-                                    empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
-                                    onDetalle()
+                                /*
+                                empresaViewModel.buscarTrabajador(material.idTrabajador)
+                                onDetalle()*/
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -239,7 +238,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Id : ${trabajador.idTrabajador ?: "No disponible"}",
+                                        text = "Id : ${material.idMaterial ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -252,7 +251,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Nombre : ${trabajador.nombre ?: "No disponible"}",
+                                        text = "Nombre : ${material.titulo ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -260,12 +259,12 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
                                 Row {
                                     Icon(
-                                        imageVector = Icons.Filled.Email,
+                                        imageVector = Icons.Filled.KeyboardArrowUp,
                                         contentDescription = "Categoria",
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Email : ${trabajador.email ?: "No disponible"}",
+                                        text = "Stock : ${material.stock ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )

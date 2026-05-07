@@ -60,7 +60,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idTrabajador = empresaViewModel.trabajadorBuscado?.idTrabajador
+    val idTrabajador = empresaViewModel.trabajadorBuscado?.idTrabajador ?: 0
     val idEmpresa: Int = empresaViewModel.trabajadorBuscado?.idEmpresa  ?: session.getEmpresaId()
     var nombre by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.nombre ?: "") }
     var apellidos by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.apellidos ?: "") }
@@ -104,7 +104,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 OutlinedTextField(
-                    value = idTrabajador?.toString() ?: "Nuevo" ,
+                    value = idTrabajador.toString(),
                     onValueChange = {  },
                     label = { Text("Id Trabajador") },
                     enabled = false,
@@ -190,7 +190,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = numeroTelefono,
                     onValueChange = { numeroTelefono = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Número Telefono") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -207,7 +207,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = dni,
                     onValueChange = { dni = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Dni") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -224,7 +224,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = direccion,
                     onValueChange = { direccion = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Dirección") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -241,7 +241,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = fechaCreacion,
                     onValueChange = { fechaCreacion = it },
-                    label = { Text("Contraseña") },
+                    label = { Text("Fecha Creación ") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp) ,
@@ -287,7 +287,12 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 onClick = {
                     if(nombre != null && nombre != "" && email != null && email != "" && password != null && password != ""){
                         val trabajador = TrabajadorDTO(idTrabajador , idEmpresa , nombre , apellidos , email , password , numeroTelefono , dni , direccion , fechaCreacion)
-                        empresaViewModel.editarTrabajador(trabajador)
+                        if(esEdicion){
+                            empresaViewModel.editarTrabajador(trabajador)
+                        }else{
+                            empresaViewModel.crearTrabajador(trabajador)
+                        }
+                        onback()
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")

@@ -2,6 +2,7 @@ package com.example.frontgestor.Api
 
 import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.LoginDTO
+import com.example.frontgestor.Modelos.MaterialListaDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import retrofit2.Response
@@ -25,6 +26,9 @@ interface ApiService {
     @GET("trabajador/listar/{idEmpresa}")
     suspend fun listarTrabajadores(@Path("idEmpresa") id: Int): Response<List<TrabajadorListaDTO>>
 
+    @GET("material/listar/{idEmpresa}")
+    suspend fun listarMateriales(@Path("idEmpresa") id: Int): Response<List<MaterialListaDTO>>
+
 
     //busquedas por id
     @GET("empresa/buscar/{id}")
@@ -38,10 +42,16 @@ interface ApiService {
     @POST("trabajador/editar")
     suspend fun editarTrabajador(@Body trabajador: TrabajadorDTO): Response<TrabajadorDTO>
 
+    @POST("trabajador/alta")
+    suspend fun crearTrabajador(@Body trabajador: TrabajadorDTO): Response<TrabajadorDTO>
+
+    @POST("material/editar")
+    suspend fun editarMaterial(@Body material: MaterialListaDTO): Response<MaterialListaDTO>
+
     companion object {
         private var apiService: ApiService? = null
 
-        private const val BASE_URL = "http://192.168.0.65:8096/res/"
+        private const val BASE_URL = "http://192.168.0.23:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

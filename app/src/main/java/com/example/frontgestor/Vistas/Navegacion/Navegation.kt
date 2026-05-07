@@ -17,6 +17,7 @@ import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
+import com.example.frontgestor.Vistas.Empresa.ListaMateriales
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
@@ -74,6 +75,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.popBackStack()
                     navController.navigate(AppDestination.Logueo.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaMateriales.route)
                 }
             )
         }
@@ -88,6 +92,12 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 },
                 {
                     navController.navigate(AppDestination.DetalleTrabajador.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.FormularioTrabajador.route + "/false")
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaMateriales.route)
                 }
             )
         }
@@ -121,6 +131,23 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
             )
         }
 
+
+        composable(route = AppDestination.ListaMateriales.route){
+            ListaMateriales(modifier ,
+                sesion ,
+                empresaViewModel ,
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.MenuMainE.route)
+                } ,
+                {
+
+                } ,
+                {
+
+                }
+            )
+        }
         //trabajador
 
         composable(route = AppDestination.MenuTrabajador.route){
