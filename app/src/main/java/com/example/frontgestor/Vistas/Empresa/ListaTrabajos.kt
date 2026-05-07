@@ -65,17 +65,17 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaTrabajadores(modifier: Modifier = Modifier ,
+fun ListaTrabajos(modifier: Modifier = Modifier ,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit ,
     onDetalle:() -> Unit ,
     onCrearNuevo : () -> Unit ,
-    onNavigateToAlmacen : () -> Unit,
-    onNavigateToTrabajos : () -> Unit
+    onNavigateToAlmacen : () -> Unit ,
+    onNavigateToTrabajadores: () -> Unit
 ){
     //variables del navigationBar
-    var selectedItem by remember { mutableStateOf(1) }
+    var selectedItem by remember { mutableStateOf(2) }
     val items = listOf("Info", "Trabajadores", "Tareas", "Almacen")
     val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow , Icons.Filled.Menu)
 
@@ -85,12 +85,12 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
     //variable para el buscador
     var textoBusqueda by remember { mutableStateOf("") }
-    val trabajadoresFiltrados = empresaViewModel.trabajadores?.filter {
-        it.nombre?.contains(textoBusqueda, ignoreCase = true) == true
+    val trabajosFiltrados = empresaViewModel.trabajos?.filter {
+        it.titulo?.contains(textoBusqueda, ignoreCase = true) == true
     }
 
     LaunchedEffect(Unit){
-        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+        empresaViewModel.listarTrabajos(sesion.getEmpresaId())
     }
 
     Scaffold(
@@ -117,7 +117,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                 ),
                 actions = {
                     IconButton(onClick = {
-                        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+                        empresaViewModel.listarTrabajos(sesion.getEmpresaId())
                         lanzador.launch {
                             snackbarEstado.showSnackbar(
                                 message = "Actualizando lista de trabajadores...",
@@ -163,8 +163,8 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                             if(index == 0){
                                 onBack()
                             }
-                            if(index == 2){
-                                onNavigateToTrabajos()
+                            if(index == 1){
+                                onNavigateToTrabajadores()
                             }
                             if(index == 3){
                                 onNavigateToAlmacen()
@@ -215,7 +215,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(trabajadoresFiltrados ?: emptyList()) { trabajador ->
+                    items(trabajosFiltrados ?: emptyList()) { trabajo ->
 
                         Card(
                             modifier = Modifier
@@ -228,8 +228,8 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-                                    empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
-                                    onDetalle()
+
+                                onDetalle()
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -240,7 +240,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Id : ${trabajador.idTrabajador ?: "No disponible"}",
+                                        text = "Id : ${trabajo.idTrabajo ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -253,10 +253,20 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Nombre : ${trabajador.nombre ?: "No disponible"}",
+                                        text = "Titulo : ${trabajo.titulo ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
+                                }
+                                var estado = "No disponible"
+                                if(trabajo.estado == "P"){
+                                    estado = "Proceso"
+                                }else if(trabajo.estado == "F"){
+                                    estado = "Finalizado"
+                                }else if(trabajo.estado == "E"){
+                                    estado = "Espera"
+                                }else if(trabajo.estado == "R"){
+                                    estado = "Revisión"
                                 }
 
                                 Row {
@@ -266,7 +276,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Email : ${trabajador.email ?: "No disponible"}",
+                                        text = "Estado : $estado",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )

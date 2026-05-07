@@ -3,8 +3,11 @@ package com.example.frontgestor.Api
 import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.LoginDTO
 import com.example.frontgestor.Modelos.MaterialDTO
+import com.example.frontgestor.Modelos.RegistroMaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
+import com.example.frontgestor.Modelos.TrabajoDTO
+import com.example.frontgestor.Modelos.TrabajoListaDTO
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,8 +29,14 @@ interface ApiService {
     @GET("trabajador/listar/{idEmpresa}")
     suspend fun listarTrabajadores(@Path("idEmpresa") id: Int): Response<List<TrabajadorListaDTO>>
 
+    @GET("trabajo/listar/{idEmpresa}")
+    suspend fun listarTrabajos(@Path("idEmpresa") id: Int): Response<List<TrabajoListaDTO>>
+
     @GET("material/listar/{idEmpresa}")
     suspend fun listarMateriales(@Path("idEmpresa") id: Int): Response<List<MaterialDTO>>
+
+    @GET("registroMaterial/listar/{idEmpresa}")
+    suspend fun listarRegistrosMateriales(@Path("idEmpresa") id: Int): Response<List<RegistroMaterialDTO>>
 
 
     //busquedas por id
@@ -36,6 +45,9 @@ interface ApiService {
 
     @GET("trabajador/buscar/{id}")
     suspend fun buscarTrabajador(@Path("id") id: Int): Response<TrabajadorDTO>
+
+    @GET("trabajo/buscar/{id}")
+    suspend fun buscarTrabajo(@Path("id") id: Int): Response<TrabajoDTO>
 
 
     //editar o altas

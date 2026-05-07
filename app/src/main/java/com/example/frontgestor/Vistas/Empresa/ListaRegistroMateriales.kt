@@ -1,6 +1,5 @@
 package com.example.frontgestor.Vistas.Empresa
 
-import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,8 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -54,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -62,22 +65,18 @@ import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaTrabajadores(modifier: Modifier = Modifier ,
+fun ListaRegistroMateriales(modifier: Modifier = Modifier ,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit ,
-    onDetalle:() -> Unit ,
-    onCrearNuevo : () -> Unit ,
-    onNavigateToAlmacen : () -> Unit,
-    onNavigateToTrabajos : () -> Unit
+    onListaMateriales: () -> Unit
 ){
     //variables del navigationBar
     var selectedItem by remember { mutableStateOf(1) }
-    val items = listOf("Info", "Trabajadores", "Tareas", "Almacen")
-    val icons = listOf(Icons.Filled.Info, Icons.Filled.AccountCircle, Icons.Filled.PlayArrow , Icons.Filled.Menu)
+    val items = listOf("Info", "Registro","Materiales")
+    val icons = listOf(rememberVectorPainter(Icons.Filled.Info), painterResource(R.drawable.registro), rememberVectorPainter(Icons.Filled.Menu) )
 
     //variable para el snackBar
     val snackbarEstado = remember { SnackbarHostState() }
@@ -85,12 +84,15 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
     //variable para el buscador
     var textoBusqueda by remember { mutableStateOf("") }
-    val trabajadoresFiltrados = empresaViewModel.trabajadores?.filter {
-        it.nombre?.contains(textoBusqueda, ignoreCase = true) == true
+    val registrosMaterialesFiltrados = empresaViewModel.registrosMateriales?.filter { registro ->
+        val materialCoincide = registro.tituloMaterial?.contains(textoBusqueda, ignoreCase = true) == true
+        val trabajoCoincide = registro.tituloTrabajo?.contains(textoBusqueda, ignoreCase = true) == true
+
+        materialCoincide || trabajoCoincide
     }
 
     LaunchedEffect(Unit){
-        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+        empresaViewModel.listarRegistrosMateriales(sesion.getEmpresaId())
     }
 
     Scaffold(
@@ -117,10 +119,10 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                 ),
                 actions = {
                     IconButton(onClick = {
-                        empresaViewModel.listarTrabajadores(sesion.getEmpresaId())
+                        empresaViewModel.listarRegistrosMateriales(sesion.getEmpresaId())
                         lanzador.launch {
                             snackbarEstado.showSnackbar(
-                                message = "Actualizando lista de trabajadores...",
+                                message = "Actualizando lista de Registros de materiales...",
                                 duration = SnackbarDuration.Short
                             )
                         }
@@ -131,13 +133,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                             tint = Color(0xFF2BB673)
                         )
                     }
-                    IconButton(onClick = { onCrearNuevo()}) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Añadir trabajador",
-                            tint = Color(0xFF2BB673)
-                        )
-                    }
+
                 }
             )
         } ,
@@ -149,7 +145,13 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
             ) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
-                        icon = { Icon(icons[index], contentDescription = item) },
+                        icon = {
+                            Icon(
+                                painter = icons[index],
+                                contentDescription = item,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        },
                         label = { Text(item) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color.White,
@@ -163,12 +165,11 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                             if(index == 0){
                                 onBack()
                             }
+
                             if(index == 2){
-                                onNavigateToTrabajos()
+                                onListaMateriales()
                             }
-                            if(index == 3){
-                                onNavigateToAlmacen()
-                            }
+
                         }
                     )
                 }
@@ -184,7 +185,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
             OutlinedTextField(
                 value = textoBusqueda,
                 onValueChange = { textoBusqueda = it },
-                placeholder = { Text("Buscar trabajador...") },
+                placeholder = { Text("Buscar  por material o trabajo ...") },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
@@ -199,7 +200,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
             )
 
 
-            if(empresaViewModel.trabajadores == null){
+            if(empresaViewModel.materiales == null){
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -215,7 +216,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(trabajadoresFiltrados ?: emptyList()) { trabajador ->
+                    items(registrosMaterialesFiltrados ?: emptyList()) { registroMaterial ->
 
                         Card(
                             modifier = Modifier
@@ -228,8 +229,6 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-                                    empresaViewModel.buscarTrabajador(trabajador.idTrabajador)
-                                    onDetalle()
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
@@ -240,7 +239,7 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Id : ${trabajador.idTrabajador ?: "No disponible"}",
+                                        text = "Id : ${registroMaterial.idRegistro ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -248,12 +247,12 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
                                 Row {
                                     Icon(
-                                        imageVector = Icons.Filled.AccountCircle,
+                                        imageVector = Icons.Filled.PlayArrow,
                                         contentDescription = "Categoria",
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Nombre : ${trabajador.nombre ?: "No disponible"}",
+                                        text = "Trabajo : ${registroMaterial.tituloTrabajo ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )
@@ -261,12 +260,38 @@ fun ListaTrabajadores(modifier: Modifier = Modifier ,
 
                                 Row {
                                     Icon(
-                                        imageVector = Icons.Filled.Email,
+                                        imageVector = Icons.Filled.Menu,
                                         contentDescription = "Categoria",
                                         modifier = Modifier.size(24.dp)
                                     )
                                     Text(
-                                        text = "Email : ${trabajador.email ?: "No disponible"}",
+                                        text = "Material : ${registroMaterial.tituloMaterial ?: "No disponible"}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                }
+
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Categoria",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Text(
+                                        text = "Cantidad : ${registroMaterial.cantidad ?: "No disponible"}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                }
+
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Filled.DateRange,
+                                        contentDescription = "Categoria",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Text(
+                                        text = "Fecha y hora : ${registroMaterial.fecha ?: "No disponible"}",
                                         style = MaterialTheme.typography.bodyMedium,
                                         modifier = Modifier.padding(4.dp)
                                     )

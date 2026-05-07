@@ -70,7 +70,8 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
     empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit ,
     onEditar:() -> Unit ,
-    onCrearNuevo : () -> Unit
+    onCrearNuevo : () -> Unit,
+    onRegistro: () -> Unit
 
 ){
     //variables del navigationBar
@@ -172,10 +173,7 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
                                 onBack()
                             }
                             if(index ==1){
-
-                            }
-                            if(index == 2){
-
+                                onRegistro()
                             }
 
                         }

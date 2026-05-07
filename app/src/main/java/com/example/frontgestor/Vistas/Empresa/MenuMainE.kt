@@ -55,7 +55,8 @@ fun MenuMainE(modifier: Modifier = Modifier,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit ,
-    onNavigateToAlmacen : () -> Unit
+    onNavigateToAlmacen : () -> Unit ,
+    onNavigateToTrabajos : () -> Unit
 ){
     //variables del navigationBar
     var selectedItem by remember { mutableStateOf(0) }
@@ -65,7 +66,7 @@ fun MenuMainE(modifier: Modifier = Modifier,
     //lamamos siempre que se llama a esta pantalla para referescar la infoprmacion
     empresaViewModel.bucarEmpresa(sesion.getEmpresaId())
     Scaffold(
-        modifier = modifier,
+        modifier = Modifier,
         containerColor = Color.Transparent ,
         bottomBar = {
             NavigationBar(
@@ -90,7 +91,7 @@ fun MenuMainE(modifier: Modifier = Modifier,
                                 onNavegationToLista()
                             }
                             if(index == 2){
-
+                                onNavigateToTrabajos()
                             }
 
                             if(index == 3){

@@ -19,7 +19,9 @@ import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioMaterial
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
 import com.example.frontgestor.Vistas.Empresa.ListaMateriales
+import com.example.frontgestor.Vistas.Empresa.ListaRegistroMateriales
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
+import com.example.frontgestor.Vistas.Empresa.ListaTrabajos
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
 import com.example.frontgestor.Vistas.Trabajador.MenuTrabajador
@@ -79,6 +81,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 {
                     navController.navigate(AppDestination.ListaMateriales.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaTrabajos.route)
                 }
             )
         }
@@ -99,6 +104,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 {
                     navController.navigate(AppDestination.ListaMateriales.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaTrabajos.route)
                 }
             )
         }
@@ -146,6 +154,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 {
                     navController.navigate(AppDestination.FormularioMaterial.route + "/false")
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaRegistroMateriales.route)
                 }
             )
         }
@@ -165,6 +176,43 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 esEdicion
             )
         }
+        composable(route = AppDestination.ListaRegistroMateriales.route){
+            ListaRegistroMateriales(modifier ,
+                sesion ,
+                empresaViewModel ,
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.MenuMainE.route)
+                },
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.ListaMateriales.route)
+                }
+            )
+        }
+
+
+        composable(route = AppDestination.ListaTrabajos.route){
+            ListaTrabajos(modifier ,
+                sesion ,
+                empresaViewModel ,
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.MenuMainE.route)
+                },
+                {},
+                {},
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.ListaMateriales.route)
+                },
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.ListaTrabajadores.route)
+                }
+            )
+        }
+
         //trabajador
 
         composable(route = AppDestination.MenuTrabajador.route){

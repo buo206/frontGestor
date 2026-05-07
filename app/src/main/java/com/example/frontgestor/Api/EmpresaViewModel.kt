@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.MaterialDTO
+import com.example.frontgestor.Modelos.RegistroMaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
+import com.example.frontgestor.Modelos.TrabajoListaDTO
 import kotlinx.coroutines.launch
 
 class EmpresaViewModel : ViewModel() {
@@ -26,11 +28,16 @@ class EmpresaViewModel : ViewModel() {
     var materiales by mutableStateOf<List<MaterialDTO>?>(null)
         private set
 
+    var registrosMateriales by mutableStateOf<List<RegistroMaterialDTO>?>(null)
+        private set
+
     var materialBuscado by mutableStateOf<MaterialDTO?>(null)
 
     var trabajadorBuscado by mutableStateOf<TrabajadorDTO?>(null)
         private set
 
+    var trabajos by mutableStateOf<List<TrabajoListaDTO>?>(null)
+        private set
 
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
@@ -93,6 +100,23 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun listarTrabajos(empresaId : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.listarTrabajos(empresaId)
+            if(result.isSuccessful){
+                trabajos = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una empresa con esta id"
+                }
+            }
+            cargando = false
+        }
+    }
+
     fun listarMateriales(empresaId : Int){
         viewModelScope.launch {
             cargando = true
@@ -101,6 +125,23 @@ class EmpresaViewModel : ViewModel() {
             var result = api.listarMateriales(empresaId)
             if(result.isSuccessful){
                 materiales = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una empresa con esta id"
+                }
+            }
+            cargando = false
+        }
+    }
+
+    fun listarRegistrosMateriales(empresaId : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.listarRegistrosMateriales(empresaId)
+            if(result.isSuccessful){
+                registrosMateriales = result.body()
             }else{
                 if(result.code()== 400){
                     mensageError = "No existe una empresa con esta id"
@@ -181,5 +222,4 @@ class EmpresaViewModel : ViewModel() {
             cargando = false
         }
     }
-
 }
