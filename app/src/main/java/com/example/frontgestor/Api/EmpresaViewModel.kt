@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.EmpresaDTO
-import com.example.frontgestor.Modelos.MaterialListaDTO
+import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import kotlinx.coroutines.launch
@@ -23,10 +23,10 @@ class EmpresaViewModel : ViewModel() {
     var trabajadores by mutableStateOf<List<TrabajadorListaDTO>?>(null)
         private set
 
-    var materiales by mutableStateOf<List<MaterialListaDTO>?>(null)
+    var materiales by mutableStateOf<List<MaterialDTO>?>(null)
         private set
 
-    var materialBuscado by mutableStateOf<MaterialListaDTO?>(null)
+    var materialBuscado by mutableStateOf<MaterialDTO?>(null)
 
     var trabajadorBuscado by mutableStateOf<TrabajadorDTO?>(null)
         private set
@@ -122,7 +122,7 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
-    fun editarMaterial(material : MaterialListaDTO){
+    fun editarMaterial(material : MaterialDTO){
         viewModelScope.launch {
             cargando = true
             mensageError = null
@@ -137,6 +137,10 @@ class EmpresaViewModel : ViewModel() {
             }
             cargando = false
         }
+    }
+
+    fun buscarMaterial(material : MaterialDTO){
+        materialBuscado = material
     }
 
     fun crearTrabajador(trabajdor : TrabajadorDTO){

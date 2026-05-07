@@ -196,7 +196,7 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
             )
 
 
-            if(empresaViewModel.trabajadores == null){
+            if(empresaViewModel.materiales == null){
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -225,9 +225,8 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-                                /*
-                                empresaViewModel.buscarTrabajador(material.idTrabajador)
-                                onDetalle()*/
+                                empresaViewModel.buscarMaterial(material)
+                                onDetalle()
                             }
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {

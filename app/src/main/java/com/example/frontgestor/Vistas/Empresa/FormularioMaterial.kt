@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 import com.example.frontgestor.Api.EmpresaViewModel
+import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
@@ -212,8 +213,14 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    if(titulo != null && titulo != ""){
+                    if(titulo != null && titulo != "" && stock != null && stock >= 0){
+                        val material = MaterialDTO(idMaterial, idEmpresa , titulo , stock)
+                        if(esEdicion){
+                            empresaViewModel.editarMaterial(material)
+                        }else{
 
+                        }
+                        onback()
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
