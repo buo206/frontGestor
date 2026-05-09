@@ -10,6 +10,7 @@ import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroMaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
+import com.example.frontgestor.Modelos.TrabajoDTO
 import com.example.frontgestor.Modelos.TrabajoListaDTO
 import kotlinx.coroutines.launch
 
@@ -38,6 +39,9 @@ class EmpresaViewModel : ViewModel() {
 
     var trabajos by mutableStateOf<List<TrabajoListaDTO>?>(null)
         private set
+    var trabajoBuscado by mutableStateOf<TrabajoDTO?>(null)
+        private set
+
 
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
@@ -64,6 +68,22 @@ class EmpresaViewModel : ViewModel() {
             var result = api.buscarTrabajador(id)
             if(result.isSuccessful){
                 trabajadorBuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe una un trabajador con esta id"
+                }
+            }
+            cargando = false
+        }
+    }
+    fun buscarTrabajo(id : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarTrabajo(id)
+            if(result.isSuccessful){
+                trabajoBuscado = result.body()
             }else{
                 if(result.code()== 400){
                     mensageError = "No existe una un trabajador con esta id"

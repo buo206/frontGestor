@@ -199,7 +199,7 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
             )
 
 
-            if(empresaViewModel.trabajadores == null){
+            if(empresaViewModel.trabajos == null){
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -228,7 +228,7 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                                 contentColor = Color.White
                             ) ,
                             onClick = {
-
+                                empresaViewModel.buscarTrabajo(trabajo.idTrabajo)
                                 onDetalle()
                             }
                         ) {

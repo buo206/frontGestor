@@ -7,5 +7,6 @@ data class TrabajoDTO(
     val descripcion : String ,
     val fechaInicio : String ,
     val fechaFinal : String ,
+    val anotacion : String ,
     val estado : String ,
 )

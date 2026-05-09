@@ -66,7 +66,7 @@ interface ApiService {
     companion object {
         private var apiService: ApiService? = null
 
-        private const val BASE_URL = "http://192.168.0.23:8096/res/"
+        private const val BASE_URL = "http://192.168.0.27:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

@@ -18,6 +18,7 @@ import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioMaterial
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
+import com.example.frontgestor.Vistas.Empresa.FormularioTrabajo
 import com.example.frontgestor.Vistas.Empresa.ListaMateriales
 import com.example.frontgestor.Vistas.Empresa.ListaRegistroMateriales
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
@@ -176,6 +177,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 esEdicion
             )
         }
+
         composable(route = AppDestination.ListaRegistroMateriales.route){
             ListaRegistroMateriales(modifier ,
                 sesion ,
@@ -200,7 +202,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                     navController.popBackStack()
                     navController.navigate(AppDestination.MenuMainE.route)
                 },
-                {},
+                {
+                    navController.navigate(AppDestination.FormularioMaterial.route + "/true")
+                },
                 {},
                 {
                     navController.popBackStack()
@@ -210,6 +214,22 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                     navController.popBackStack()
                     navController.navigate(AppDestination.ListaTrabajadores.route)
                 }
+            )
+        }
+
+        composable(
+            route = AppDestination.FormularioMaterial.route + "/{esEdicion}",
+            arguments = listOf(
+                navArgument("esEdicion") { type = NavType.BoolType }
+            )
+        ){ backStackEntry ->
+            val esEdicion = backStackEntry.arguments?.getBoolean("esEdicion") ?: true
+            FormularioTrabajo(modifier, empresaViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion ,
+                esEdicion
             )
         }
 
