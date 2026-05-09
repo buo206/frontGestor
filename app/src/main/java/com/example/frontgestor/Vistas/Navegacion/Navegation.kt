@@ -21,6 +21,7 @@ import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajo
 import com.example.frontgestor.Vistas.Empresa.ListaMateriales
 import com.example.frontgestor.Vistas.Empresa.ListaRegistroMateriales
+import com.example.frontgestor.Vistas.Empresa.ListaRegistroTrabajador
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajos
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
@@ -121,6 +122,8 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 {
                     navController.navigate(AppDestination.FormularioTrabajador.route + "/true")
+                },{
+                    navController.navigate(AppDestination.ListaRegistroTrabajador.route)
                 }
             )
         }
@@ -213,6 +216,15 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.popBackStack()
                     navController.navigate(AppDestination.ListaTrabajadores.route)
+                }
+            )
+        }
+
+        composable(route = AppDestination.ListaRegistroTrabajador.route){
+            ListaRegistroTrabajador(modifier ,
+                empresaViewModel ,
+                {
+                    navController.popBackStack()
                 }
             )
         }

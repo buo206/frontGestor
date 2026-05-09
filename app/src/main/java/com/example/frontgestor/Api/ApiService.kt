@@ -4,6 +4,7 @@ import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.LoginDTO
 import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroMaterialDTO
+import com.example.frontgestor.Modelos.RegistroTrabajoDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.Modelos.TrabajoDTO
@@ -48,6 +49,9 @@ interface ApiService {
 
     @GET("trabajo/buscar/{id}")
     suspend fun buscarTrabajo(@Path("id") id: Int): Response<TrabajoDTO>
+
+    @GET("registroTrabajo/buscarRegistroTrabajador/{idTrabajador}")
+    suspend fun buscarRegistroTrabajador(@Path("idTrabajador") id: Int): Response<List<RegistroTrabajoDTO>>
 
 
     //editar o altas

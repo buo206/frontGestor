@@ -34,7 +34,8 @@ import com.example.frontgestor.R
 fun DetalleTrabajador(modifier: Modifier = Modifier ,
     empresaViewModel: EmpresaViewModel,
     onBack : () -> Unit ,
-    onEditar: () ->Unit
+    onEditar: () ->Unit,
+    onRegistroTrabajador : () -> Unit
 ){
     if(empresaViewModel.trabajadorBuscado == null){
         Box(
@@ -130,6 +131,18 @@ fun DetalleTrabajador(modifier: Modifier = Modifier ,
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            Button(
+                onClick = {
+                    onRegistroTrabajador()
+                },
+                modifier = Modifier.fillMaxWidth() ,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.personalizadoVerdoso),
+                    contentColor = colorResource(R.color.white)
+                )
+            ) {
+                Text("Mirar tareas asignadas")
+            }
             Button(
                 onClick = {
                     empresaViewModel.limpiarTrabajador()

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.frontgestor.Modelos.EmpresaDTO
 import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroMaterialDTO
+import com.example.frontgestor.Modelos.RegistroTrabajoDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.Modelos.TrabajoDTO
@@ -42,6 +43,10 @@ class EmpresaViewModel : ViewModel() {
     var trabajoBuscado by mutableStateOf<TrabajoDTO?>(null)
         private set
 
+    //registros de un trabajador en tareas
+    var registrosTrabajador by mutableStateOf<List<RegistroTrabajoDTO>?>(null)
+        private set
+
 
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
@@ -60,6 +65,22 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun buscarRegistroTrabajador(id : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarRegistroTrabajador(id)
+            if(result.isSuccessful){
+                registrosTrabajador = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = "No existe un trabajador con un retgistro"
+                }
+            }
+            cargando = false
+        }
+    }
     fun buscarTrabajador(id : Int){
         viewModelScope.launch {
             cargando = true
