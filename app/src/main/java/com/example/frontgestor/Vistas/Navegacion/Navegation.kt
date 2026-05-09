@@ -203,7 +203,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                     navController.navigate(AppDestination.MenuMainE.route)
                 },
                 {
-                    navController.navigate(AppDestination.FormularioMaterial.route + "/true")
+                    navController.navigate(AppDestination.FormularioTrabajo.route + "/true")
                 },
                 {},
                 {
@@ -218,7 +218,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
         }
 
         composable(
-            route = AppDestination.FormularioMaterial.route + "/{esEdicion}",
+            route = AppDestination.FormularioTrabajo.route + "/{esEdicion}",
             arguments = listOf(
                 navArgument("esEdicion") { type = NavType.BoolType }
             )

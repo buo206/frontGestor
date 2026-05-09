@@ -62,10 +62,10 @@ import java.time.LocalDate
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FormularioMaterial(modifier: Modifier = Modifier ,
-                         empresaViewModel: EmpresaViewModel ,
-                         onback: () -> Unit ,
-                         session: SessionManager ,
-                         esEdicion: Boolean
+    empresaViewModel: EmpresaViewModel ,
+    onback: () -> Unit ,
+    session: SessionManager ,
+    esEdicion: Boolean
 ){
     //variables del scnackba
     val snackbarEstado = remember { SnackbarHostState() }

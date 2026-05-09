@@ -6,6 +6,8 @@ data class RegistroMaterialDTO(
     val tituloTrabajo : String ,
     val idMaterial : Int ,
     val tituloMaterial : String ,
+    val idTrabajador : Int ,
+    val nombreTrabajador :String ,
     val fecha : String ,
     val cantidad : Int
 )

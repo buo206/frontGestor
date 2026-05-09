@@ -247,6 +247,19 @@ fun ListaRegistroMateriales(modifier: Modifier = Modifier ,
 
                                 Row {
                                     Icon(
+                                        imageVector = Icons.Filled.AccountCircle,
+                                        contentDescription = "Trabajador",
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Text(
+                                        text = "Trabajador : ${registroMaterial.nombreTrabajador ?: "No disponible"}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(4.dp)
+                                    )
+                                }
+
+                                Row {
+                                    Icon(
                                         imageVector = Icons.Filled.PlayArrow,
                                         contentDescription = "Categoria",
                                         modifier = Modifier.size(24.dp)
