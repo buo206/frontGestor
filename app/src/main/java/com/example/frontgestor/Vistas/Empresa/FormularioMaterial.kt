@@ -1,4 +1,5 @@
 package com.example.frontgestor.Vistas.Empresa
+
 import android.os.Build
 import android.se.omapi.Session
 import androidx.activity.result.launch
@@ -24,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -35,6 +37,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,6 +80,13 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
     var titulo by remember { mutableStateOf(empresaViewModel.materialBuscado?.titulo ?: "") }
     var stock by remember { mutableStateOf(empresaViewModel.materialBuscado?.stock ?: 1) }
 
+
+    //borramos el mensage para que no haya problema al salir sin guardar
+    empresaViewModel.limpiarErrorMensage()
+
+    //variable para mostrar dialogo de alerta
+    var mostrarDialogoSalida by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -99,6 +109,35 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            if (mostrarDialogoSalida) {
+                AlertDialog(
+                    onDismissRequest = { mostrarDialogoSalida = false },
+                    title = { Text(text = "Cambios sin guardar") },
+                    text = { Text(text = "¿Estás seguro de que quieres salir? Se perderán los cambios que no hayas guardado.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida = false
+                                onback()
+                            }
+                        ) {
+                            Text("Salir sin guardar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { mostrarDialogoSalida = false }
+                        ) {
+                            Text(
+                                "Permanecer y arreglar",
+                                color = colorResource(id = R.color.personalizadoVerdoso)
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             Column(
                 modifier = Modifier
@@ -189,7 +228,14 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    onback()
+                    if(empresaViewModel.mensageError != null){
+                        lanzador.launch {
+                            snackbarEstado.showSnackbar(empresaViewModel.mensageError.toString())
+                        }
+                        mostrarDialogoSalida = true
+                    }else{
+                        onback()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
@@ -213,6 +259,7 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
+                    empresaViewModel.limpiarErrorMensage()
                     if(titulo != null && titulo != "" && stock != null && stock >= 0){
                         val material = MaterialDTO(idMaterial, idEmpresa , titulo , stock)
                         if(esEdicion){

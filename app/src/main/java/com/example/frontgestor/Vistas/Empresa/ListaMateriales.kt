@@ -132,7 +132,7 @@ fun ListaMateriales(modifier: Modifier = Modifier ,
                         )
                     }
                     IconButton(onClick = {
-                        empresaViewModel.limpiarTrabajador()
+                        empresaViewModel.limpirarMaterial()
                         onCrearNuevo()
                     }) {
                         Icon(

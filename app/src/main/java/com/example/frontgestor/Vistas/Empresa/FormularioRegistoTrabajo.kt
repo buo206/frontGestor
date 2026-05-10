@@ -4,8 +4,10 @@ import android.os.Build
 import android.se.omapi.Session
 import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.core.copy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,12 +17,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
@@ -29,6 +43,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,18 +55,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 import com.example.frontgestor.Api.EmpresaViewModel
+import com.example.frontgestor.Modelos.MaterialDTO
+import com.example.frontgestor.Modelos.RegistroTrabajoDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
+import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FormularioTrabajador(modifier: Modifier = Modifier ,
+fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
     empresaViewModel: EmpresaViewModel ,
     onback: () -> Unit ,
     session: SessionManager ,
@@ -62,25 +83,34 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idTrabajador = empresaViewModel.trabajadorBuscado?.idTrabajador ?: 0
-    val idEmpresa: Int = empresaViewModel.trabajadorBuscado?.idEmpresa  ?: session.getEmpresaId()
-    var nombre by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.nombre ?: "") }
-    var apellidos by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.apellidos ?: "") }
-    var email by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.email ?: "") }
-    var password by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.password ?: "1234") }
-    var numeroTelefono by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.numeroTelefono ?: "") }
-    var dni by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.dni ?: "") }
-    var direccion by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.dirreccion ?: "") }
-
-    val fechaActual = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-    var fechaCreacion by remember { mutableStateOf(empresaViewModel.trabajadorBuscado?.fechaCreacion ?: fechaActual) }
+    val idTrabajo = empresaViewModel.registroTrabajobuscado?.idTrabajo ?: empresaViewModel.trabajoBuscado?.idTrabajo
+    val idTrabajador = empresaViewModel.registroTrabajobuscado?.idTrabajador  ?: 0
+    val nombreTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?:  ""
+    val apellidosTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?: ""
+    var rol by remember { mutableStateOf(empresaViewModel.registroTrabajobuscado?.rol ?: "") }
 
 
     //borramos el mensage para que no haya problema al salir sin guardar
     empresaViewModel.limpiarErrorMensage()
+    LaunchedEffect(Unit) {
+        if (empresaViewModel.trabajadores.isNullOrEmpty()) {
+            empresaViewModel.listarTrabajadores(session.getEmpresaId())
+        }
+    }
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
+
+
+    var expandido by remember { mutableStateOf(false) }
+    var trabajadorSeleccionado by remember { mutableStateOf< TrabajadorListaDTO?>(null) }
+
+    val todosLosTrabajadores = empresaViewModel.trabajadores ?: emptyList()
+    val idsAsignados = empresaViewModel.registrosTrabajo?.map { it.idTrabajador } ?: emptyList()
+
+    // Filtramos
+    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador !in idsAsignados }
+
 
     Box(
         modifier = Modifier
@@ -142,9 +172,9 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 OutlinedTextField(
-                    value = idTrabajador.toString(),
+                    value = idTrabajo.toString(),
                     onValueChange = {  },
-                    label = { Text("Id Trabajador") },
+                    label = { Text("Id Trabajo") },
                     enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -157,10 +187,111 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
 
 
 
+                if(idTrabajador != 0){
+                    OutlinedTextField(
+                        value = idTrabajador.toString(),
+                        onValueChange = {  },
+                        label = { Text("ID Trabajador") },
+                        enabled = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)  ,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = nombreTrabajador,
+                        onValueChange = { },
+                        label = { Text("Nombre Trabajador") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)  ,
+                        readOnly = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                        )
+                    )
+                    OutlinedTextField(
+                        value = apellidosTrabajador,
+                        onValueChange = { },
+                        label = { Text("Apellidos Trabajador") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)  ,
+                        readOnly = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                        )
+                    )
+                }else{
+                    Text(
+                        "Asignar nuevo trabajador",
+                        modifier = Modifier.padding(8.dp),
+                        color = Color.Gray
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandido,
+                        onExpandedChange = { expandido = !expandido },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = trabajadorSeleccionado?.let { "${it.nombre}" } ?: "Selecciona un trabajador",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Trabajador disponible") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                                unfocusedBorderColor = Color.Gray,
+                            ),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandido,
+                            onDismissRequest = { expandido = false },
+                            modifier = Modifier.background(Color.White)
+                        ) {
+                            if (trabajadoresDisponibles.isNullOrEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("No hay trabajadores disponibles") },
+                                    onClick = { expandido = false }
+                                )
+                            } else {
+                                trabajadoresDisponibles?.forEach { trabajador ->
+                                    DropdownMenuItem(
+                                        text = { Text("${trabajador.idTrabajador}.${trabajador.nombre} con email : ${trabajador.email} ") },
+                                        onClick = {
+                                            trabajadorSeleccionado = trabajador
+                                            expandido = false
+                                        },
+                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+
                 OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
+                    value = rol,
+                    onValueChange = { rol = it },
+                    label = { Text("Rol o cargo") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -174,122 +305,8 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
 
 
 
-                OutlinedTextField(
-                    value = apellidos,
-                    onValueChange = { apellidos = it },
-                    label = { Text("Apellidos") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
 
 
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text("Correo") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
-
-
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Contraseña") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
-
-
-
-                OutlinedTextField(
-                    value = numeroTelefono,
-                    onValueChange = { numeroTelefono = it },
-                    label = { Text("Número Telefono") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
-
-
-
-                OutlinedTextField(
-                    value = dni,
-                    onValueChange = { dni = it },
-                    label = { Text("Dni") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
-
-
-
-                OutlinedTextField(
-                    value = direccion,
-                    onValueChange = { direccion = it },
-                    label = { Text("Dirección") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
-
-
-
-                OutlinedTextField(
-                    value = fechaCreacion,
-                    onValueChange = { fechaCreacion = it },
-                    label = { Text("Fecha Creación ") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp) ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
-                    )
-                )
             }
 
 
@@ -307,6 +324,7 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
                     }else{
                         onback()
                     }
+                    empresaViewModel.limpiarRegistroTrabajoBuscado()
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
@@ -331,18 +349,18 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
             Button(
                 onClick = {
                     empresaViewModel.limpiarErrorMensage()
-                    if(nombre != null && nombre != "" && email != null && email != "" && password != null && password != ""){
-                        val trabajador = TrabajadorDTO(idTrabajador , idEmpresa , nombre , apellidos , email , password , numeroTelefono , dni , direccion , fechaCreacion)
-                        if(esEdicion){
-                            empresaViewModel.editarTrabajador(trabajador)
-                        }else{
-                            empresaViewModel.crearTrabajador(trabajador)
-                        }
+
+                    if(esEdicion &&  rol.isNotEmpty()){
+                        val registroTrabajo = RegistroTrabajoDTO(idTrabajo , "" ,idTrabajador ,nombreTrabajador , apellidosTrabajador ,rol)
+                        empresaViewModel.editarRegistroTrabajo(registroTrabajo)
+                    }else if(!esEdicion && trabajadorSeleccionado != null  &&  rol.isNotEmpty()){
+
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
                         }
                     }
+
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
@@ -362,4 +380,3 @@ fun FormularioTrabajador(modifier: Modifier = Modifier ,
         }
     }
 }
-

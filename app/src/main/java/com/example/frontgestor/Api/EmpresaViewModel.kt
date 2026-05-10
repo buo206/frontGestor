@@ -46,7 +46,13 @@ class EmpresaViewModel : ViewModel() {
     //registros de un trabajador en tareas
     var registrosTrabajador by mutableStateOf<List<RegistroTrabajoDTO>?>(null)
         private set
+    var registrosTrabajo by mutableStateOf<List<RegistroTrabajoDTO>?>(null)
+        private set
 
+    var registroTrabajobuscado by mutableStateOf<RegistroTrabajoDTO?>(null)
+        private set
+
+    //busquedas
 
     fun bucarEmpresa(id : Int ){
         viewModelScope.launch {
@@ -58,7 +64,7 @@ class EmpresaViewModel : ViewModel() {
                 empresa = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una empresa con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -75,7 +81,7 @@ class EmpresaViewModel : ViewModel() {
                 registrosTrabajador = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe un trabajador con un retgistro"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -91,7 +97,7 @@ class EmpresaViewModel : ViewModel() {
                 trabajadorBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una un trabajador con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -107,23 +113,86 @@ class EmpresaViewModel : ViewModel() {
                 trabajoBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una un trabajador con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
         }
     }
 
+    //buscar registro de trabajo por id de trabajo y de trabajador
+    fun buscarRegistroTrabajo(idTrabajo : Int , idTrabajador : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarRegistroTrabajador(idTrabajo , idTrabajador)
+            if(result.isSuccessful){
+                registroTrabajobuscado= result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = result.errorBody()?.string()
+                }
+            }
+            cargando = false
+        }
+    }
+
+
+    //registro de materiales por trabajo
+    fun buscarRegistroMaterialPorTrabajo(id : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarRegistrosMaterialesPorTrabajo(id)
+            if(result.isSuccessful){
+                 registrosMateriales= result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = result.errorBody()?.string()
+                }
+            }
+            cargando = false
+        }
+    }
+
+    fun buscarMaterial(material : MaterialDTO){
+        materialBuscado = material
+    }
+
+
+    //limpiar variables
     fun limpiarTrabajador(){
         if(cargando == false ){
             trabajadorBuscado = null
         }
     }
     fun limpirarMaterial(){
-        if(cargando == true){
+        if(cargando == false){
             materialBuscado = null
         }
     }
+
+    fun limpiarListaMateriales(){
+        if(cargando == false){
+            materiales = null
+        }
+    }
+
+    fun limpiarRegistroTrabajoBuscado(){
+        if(cargando == false){
+            registroTrabajobuscado = null
+        }
+    }
+
+    fun limpiarErrorMensage(){
+        if(cargando == false){
+            mensageError = null
+        }
+    }
+
+    //listar
     fun listarTrabajadores(empresaId : Int){
         viewModelScope.launch {
             cargando = true
@@ -134,7 +203,7 @@ class EmpresaViewModel : ViewModel() {
                 trabajadores = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una empresa con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -151,7 +220,7 @@ class EmpresaViewModel : ViewModel() {
                 trabajos = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una empresa con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -168,7 +237,7 @@ class EmpresaViewModel : ViewModel() {
                 materiales = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una empresa con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -185,13 +254,32 @@ class EmpresaViewModel : ViewModel() {
                 registrosMateriales = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "No existe una empresa con esta id"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
         }
     }
 
+    fun listarRegistrosTrabajo(trabajoId : Int){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.buscarRegistrosPorTrabajo(trabajoId)
+            if(result.isSuccessful){
+                registrosTrabajo = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = result.errorBody()?.string()
+                }
+            }
+            cargando = false
+        }
+    }
+
+
+    //editar o altas
     fun editarTrabajador(trabajdor : TrabajadorDTO){
         viewModelScope.launch {
             cargando = true
@@ -202,7 +290,7 @@ class EmpresaViewModel : ViewModel() {
                 trabajadorBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -219,16 +307,31 @@ class EmpresaViewModel : ViewModel() {
                 materialBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
         }
     }
 
-    fun buscarMaterial(material : MaterialDTO){
-        materialBuscado = material
+    fun editarRegistroTrabajo(registro : RegistroTrabajoDTO){
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+
+            var result = api.editarRegistroTrabajo(registro)
+            if(result.isSuccessful){
+                registroTrabajobuscado = result.body()
+            }else{
+                if(result.code()== 400){
+                    mensageError = result.errorBody()?.string()
+                }
+            }
+            cargando = false
+        }
     }
+
+
 
     fun crearTrabajador(trabajdor : TrabajadorDTO){
         viewModelScope.launch {
@@ -240,7 +343,7 @@ class EmpresaViewModel : ViewModel() {
                 trabajadorBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "Algun campo ha rellenado de forma incorrecta"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false
@@ -257,7 +360,7 @@ class EmpresaViewModel : ViewModel() {
                 materialBuscado = result.body()
             }else{
                 if(result.code()== 400){
-                    mensageError = "Algun campo ha rellenado de forma incorrecta o ya exite un material con ese titulo"
+                    mensageError = result.errorBody()?.string()
                 }
             }
             cargando = false

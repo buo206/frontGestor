@@ -143,6 +143,7 @@ fun DetalleTrabajador(modifier: Modifier = Modifier ,
             ) {
                 Text("Mirar tareas asignadas")
             }
+            Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = {
                     empresaViewModel.limpiarTrabajador()

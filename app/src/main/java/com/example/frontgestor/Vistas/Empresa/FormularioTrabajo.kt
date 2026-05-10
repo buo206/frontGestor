@@ -7,6 +7,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.forEach
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,23 +18,43 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +87,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     empresaViewModel: EmpresaViewModel ,
     onback: () -> Unit ,
     session: SessionManager ,
-    esEdicion: Boolean
+    esEdicion: Boolean ,
+    onEditarRegistroTrabajador : () -> Unit,
+    onCrearRegistroTrabajador: () -> Unit
 ){
     //variables del scnackba
     val snackbarEstado = remember { SnackbarHostState() }
@@ -102,6 +126,23 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     )
     val datePickerStateFinal = rememberDatePickerState()
 
+
+    //variable para saber si mosrtrar las opciones/datos a avanzadas
+    var mostrarOpcionesAvanzadas by remember { mutableStateOf(false) }
+
+
+    //borramos el mensage para que no haya problema al salir sin guardar
+    empresaViewModel.limpiarErrorMensage()
+    //y con los materiales para no ver otros registro de materiales que no sean los de este trabajo
+    empresaViewModel.limpiarListaMateriales()
+
+    //variable para mostrar dialogo de alerta
+    var mostrarDialogoSalida by remember { mutableStateOf(false) }
+
+    empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
+    empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -124,6 +165,36 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            if (mostrarDialogoSalida) {
+                AlertDialog(
+                    onDismissRequest = { mostrarDialogoSalida = false },
+                    title = { Text(text = "Cambios sin guardar") },
+                    text = { Text(text = "¿Estás seguro de que quieres salir? Se perderán los cambios que no hayas guardado.") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida = false
+                                onback()
+                            }
+                        ) {
+                            Text("Salir sin guardar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { mostrarDialogoSalida = false }
+                        ) {
+                            Text(
+                                "Permanecer y arreglar",
+                                color = colorResource(id = R.color.personalizadoVerdoso)
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
 
             Column(
                 modifier = Modifier
@@ -365,6 +436,197 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     )
                 )
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        empresaViewModel.limpiarRegistroTrabajoBuscado()
+                        onCrearRegistroTrabajador()
+                    }){
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Add",
+                            modifier = Modifier.size(24.dp),
+                            tint = colorResource(R.color.personalizadoVerdoso)
+                        )
+                    }
+                    Text(
+                        text = "Lista de Trabajadores",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(4.dp),
+                        color = colorResource(R.color.personalizadoVerdoso)
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                empresaViewModel.registrosTrabajo?.forEach{ registroTrabajo ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorResource(R.color.personalizadoVerdoso),
+                            contentColor = Color.White
+                        ) ,
+                        onClick = {
+                            empresaViewModel.buscarRegistroTrabajo(idTrabajo , registroTrabajo.idTrabajador)
+                            onEditarRegistroTrabajador()
+                        }
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row {
+
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = "Nombre",
+                                    modifier = Modifier.size(24.dp),
+                                    tint = colorResource(R.color.personalizadoVerdoso)
+                                )
+                                Text(
+                                    text = "Nombre : ${registroTrabajo.nombreTrabajador  ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = "Apellidos",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Apellidos : ${registroTrabajo.apellidosTrabajador  ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.AccountCircle,
+                                    contentDescription = "Rol",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Rol : ${registroTrabajo.rol ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                        }
+                    }
+
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = {
+
+                    }){
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Add",
+                            modifier = Modifier.size(24.dp),
+                            tint = colorResource(R.color.personalizadoVerdoso)
+                        )
+                    }
+                    Text(
+                        text = "Lista de registro de material",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(4.dp),
+                        color = colorResource(R.color.personalizadoVerdoso)
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                empresaViewModel.registrosMateriales?.forEach { registroMaterial ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = colorResource(R.color.personalizadoVerdoso),
+                            contentColor = Color.White
+                        ) ,
+                        onClick = {
+                        }
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = "Categoria",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Id : ${registroMaterial.idRegistro ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.AccountCircle,
+                                    contentDescription = "Trabajador",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Trabajador : ${registroMaterial.nombreTrabajador ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = "Categoria",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Material : ${registroMaterial.tituloMaterial ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = "Categoria",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Cantidad : ${registroMaterial.cantidad ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Filled.DateRange,
+                                    contentDescription = "Categoria",
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Fecha y hora : ${registroMaterial.fecha ?: "No disponible"}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(4.dp)
+                                )
+                            }
+
+                        }
+                    }
+                }
+
+
             }
 
 
@@ -374,7 +636,14 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    onback()
+                    if(empresaViewModel.mensageError != null){
+                        lanzador.launch {
+                            snackbarEstado.showSnackbar(empresaViewModel.mensageError.toString())
+                        }
+                        mostrarDialogoSalida = true
+                    }else{
+                        onback()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
@@ -398,6 +667,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
+                    empresaViewModel.limpiarErrorMensage();
                     if(titulo.isNotEmpty() && descripcion.isNotEmpty() && fechaInicial.isNotEmpty() && fechaFinal.isNotEmpty() && estado.isNotEmpty()){
                         /*val trabajador
                         if(esEdicion){
