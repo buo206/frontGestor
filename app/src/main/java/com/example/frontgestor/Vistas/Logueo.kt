@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.Modelos.EmpresaDTO
@@ -180,8 +181,13 @@ fun LoginScreen( modifier: Modifier = Modifier ,
             }
 
             viewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                Text(
+                    text = it, color = Color.Red,
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
             }
 
         }

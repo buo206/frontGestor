@@ -14,6 +14,8 @@ import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.Modelos.TrabajoDTO
 import com.example.frontgestor.Modelos.TrabajoListaDTO
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class EmpresaViewModel : ViewModel() {
     var cargando by mutableStateOf(false)
@@ -58,104 +60,142 @@ class EmpresaViewModel : ViewModel() {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarEmpresa(id)
-            if(result.isSuccessful){
-                empresa = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarEmpresa(id)
+                if(result.isSuccessful){
+                    empresa = result.body()
+                }else{
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
+
             cargando = false
         }
     }
 
-    fun buscarRegistroTrabajador(id : Int){
+    fun buscarRegistroTrabajador(id: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarRegistroTrabajador(id)
-            if(result.isSuccessful){
-                registrosTrabajador = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarRegistroTrabajador(id)
+                if (result.isSuccessful) {
+                    registrosTrabajador = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
-    fun buscarTrabajador(id : Int){
+
+    fun buscarTrabajador(id: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarTrabajador(id)
-            if(result.isSuccessful){
-                trabajadorBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarTrabajador(id)
+                if (result.isSuccessful) {
+                    trabajadorBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
-    fun buscarTrabajo(id : Int){
+
+    fun buscarTrabajo(id: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarTrabajo(id)
-            if(result.isSuccessful){
-                trabajoBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarTrabajo(id)
+                if (result.isSuccessful) {
+                    trabajoBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    //buscar registro de trabajo por id de trabajo y de trabajador
-    fun buscarRegistroTrabajo(idTrabajo : Int , idTrabajador : Int){
+    fun buscarRegistroTrabajo(idTrabajo: Int, idTrabajador: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarRegistroTrabajador(idTrabajo , idTrabajador)
-            if(result.isSuccessful){
-                registroTrabajobuscado= result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarRegistroTrabajador(idTrabajo, idTrabajador)
+                if (result.isSuccessful) {
+                    registroTrabajobuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
+    fun setRegistroTrabajo(registro : RegistroTrabajoDTO){
+        registroTrabajobuscado = registro
+    }
 
     //registro de materiales por trabajo
-    fun buscarRegistroMaterialPorTrabajo(id : Int){
+    fun buscarRegistroMaterialPorTrabajo(id: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarRegistrosMaterialesPorTrabajo(id)
-            if(result.isSuccessful){
-                 registrosMateriales= result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarRegistrosMaterialesPorTrabajo(id)
+                if (result.isSuccessful) {
+                    registrosMateriales = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
+
+
 
     fun buscarMaterial(material : MaterialDTO){
         materialBuscado = material
@@ -193,86 +233,111 @@ class EmpresaViewModel : ViewModel() {
     }
 
     //listar
-    fun listarTrabajadores(empresaId : Int){
+    fun listarTrabajadores(empresaId: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.listarTrabajadores(empresaId)
-            if(result.isSuccessful){
-                trabajadores = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.listarTrabajadores(empresaId)
+                if (result.isSuccessful) {
+                    trabajadores = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun listarTrabajos(empresaId : Int){
+    fun listarTrabajos(empresaId: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.listarTrabajos(empresaId)
-            if(result.isSuccessful){
-                trabajos = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.listarTrabajos(empresaId)
+                if (result.isSuccessful) {
+                    trabajos = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun listarMateriales(empresaId : Int){
+    fun listarMateriales(empresaId: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.listarMateriales(empresaId)
-            if(result.isSuccessful){
-                materiales = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.listarMateriales(empresaId)
+                if (result.isSuccessful) {
+                    materiales = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun listarRegistrosMateriales(empresaId : Int){
+    fun listarRegistrosMateriales(empresaId: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.listarRegistrosMateriales(empresaId)
-            if(result.isSuccessful){
-                registrosMateriales = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.listarRegistrosMateriales(empresaId)
+                if (result.isSuccessful) {
+                    registrosMateriales = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun listarRegistrosTrabajo(trabajoId : Int){
+    fun listarRegistrosTrabajo(trabajoId: Int) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.buscarRegistrosPorTrabajo(trabajoId)
-            if(result.isSuccessful){
-                registrosTrabajo = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.buscarRegistrosPorTrabajo(trabajoId)
+                if (result.isSuccessful) {
+                    registrosTrabajo = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
@@ -280,88 +345,111 @@ class EmpresaViewModel : ViewModel() {
 
 
     //editar o altas
-    fun editarTrabajador(trabajdor : TrabajadorDTO){
+    fun editarTrabajador(trabajdor: TrabajadorDTO) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.editarTrabajador(trabajdor)
-            if(result.isSuccessful){
-                trabajadorBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.editarTrabajador(trabajdor)
+                if (result.isSuccessful) {
+                    trabajadorBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun editarMaterial(material : MaterialDTO){
+    fun editarMaterial(material: MaterialDTO) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.editarMaterial(material)
-            if(result.isSuccessful){
-                materialBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.editarMaterial(material)
+                if (result.isSuccessful) {
+                    materialBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun editarRegistroTrabajo(registro : RegistroTrabajoDTO){
+    fun editarRegistroTrabajo(registro: RegistroTrabajoDTO) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.editarRegistroTrabajo(registro)
-            if(result.isSuccessful){
-                registroTrabajobuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.editarRegistroTrabajo(registro)
+                if (result.isSuccessful) {
+                    registroTrabajobuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-
-
-    fun crearTrabajador(trabajdor : TrabajadorDTO){
+    fun crearTrabajador(trabajdor: TrabajadorDTO) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.crearTrabajador(trabajdor)
-            if(result.isSuccessful){
-                trabajadorBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.crearTrabajador(trabajdor)
+                if (result.isSuccessful) {
+                    trabajadorBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }
     }
 
-    fun crearMaterial(material : MaterialDTO){
+    fun crearMaterial(material: MaterialDTO) {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-
-            var result = api.crearMaterial(material)
-            if(result.isSuccessful){
-                materialBuscado = result.body()
-            }else{
-                if(result.code()== 400){
+            try {
+                var result = api.crearMaterial(material)
+                if (result.isSuccessful) {
+                    materialBuscado = result.body()
+                } else {
                     mensageError = result.errorBody()?.string()
                 }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
             cargando = false
         }

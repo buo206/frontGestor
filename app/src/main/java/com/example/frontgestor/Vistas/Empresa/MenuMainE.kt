@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.frontgestor.Api.EmpresaViewModel
@@ -187,6 +188,18 @@ fun MenuMainE(modifier: Modifier = Modifier,
                 ) {
                     Text("Cerrar sesión")
                 }
+
+
+                empresaViewModel.mensageError?.let {
+                    Text(
+                        text = it,        color = Color.Red,
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
@@ -139,8 +140,10 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
 
-    empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
-    empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+    LaunchedEffect(Unit){
+        empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
+        empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+    }
 
 
     Box(
@@ -470,6 +473,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                             contentColor = Color.White
                         ) ,
                         onClick = {
+                            empresaViewModel.setRegistroTrabajo(registroTrabajo)
                             empresaViewModel.buscarRegistroTrabajo(idTrabajo , registroTrabajo.idTrabajador)
                             onEditarRegistroTrabajador()
                         }
@@ -480,8 +484,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                                 Icon(
                                     imageVector = Icons.Filled.Info,
                                     contentDescription = "Nombre",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = colorResource(R.color.personalizadoVerdoso)
+                                    modifier = Modifier.size(24.dp)
                                 )
                                 Text(
                                     text = "Nombre : ${registroTrabajo.nombreTrabajador  ?: "No disponible"}",
@@ -492,7 +495,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
                             Row {
                                 Icon(
-                                    imageVector = Icons.Filled.Info,
+                                    imageVector = Icons.Filled.Face,
                                     contentDescription = "Apellidos",
                                     modifier = Modifier.size(24.dp)
                                 )

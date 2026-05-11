@@ -10,6 +10,7 @@ import com.example.frontgestor.Modelos.LoginDTO
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.io.IOException
 
 class LoginViewModel : ViewModel() {
 
@@ -29,31 +30,41 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             cargando = true
             mensageError = null
-            val loginDTO = LoginDTO(email, password)
-            if (isEmpresa){
-                val respuesta = api.loginEmpresa(loginDTO)
-                empresa = respuesta.body()
-                if(! respuesta.isSuccessful){
-                    if(respuesta.code()== 400){
-                        mensageError = "Contraseña o email incorrecto"
-                    }else{
-                        mensageError = respuesta.message()
+            try {
+                val loginDTO = LoginDTO(email, password)
+                if (isEmpresa){
+                    val respuesta = api.loginEmpresa(loginDTO)
+                    empresa = respuesta.body()
+                    if(! respuesta.isSuccessful){
+                        if(respuesta.code()== 400){
+                            mensageError = "Contraseña o email incorrecto"
+                        }else{
+                            mensageError = respuesta.message()
+                        }
                     }
-                }
-            } else {
-                val respuesta = api.loginTrabajador(loginDTO)
-                trabajador = respuesta.body()
-                if(! respuesta.isSuccessful){
-                    if(respuesta.code()== 400){
-                        mensageError = "Contraseña o email incorrecto"
-                    }else{
-                        mensageError = respuesta.message()
+                } else {
+                    val respuesta = api.loginTrabajador(loginDTO)
+                    trabajador = respuesta.body()
+                    if(! respuesta.isSuccessful){
+                        if(respuesta.code()== 400){
+                            mensageError = "Contraseña o email incorrecto"
+                        }else{
+                            mensageError = respuesta.message()
+                        }
                     }
-                }
 
+                }
+                onSuccess()
+                cargando = false
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
             }
-            onSuccess()
-            cargando = false
+
         }
     }
 }

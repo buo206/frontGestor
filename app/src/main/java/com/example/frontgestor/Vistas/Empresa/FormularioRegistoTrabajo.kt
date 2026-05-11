@@ -324,7 +324,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                     }else{
                         onback()
                     }
-                    empresaViewModel.limpiarRegistroTrabajoBuscado()
+
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(
