@@ -262,6 +262,12 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun limpiarTrabajoBuscado(){
+        if(cargando == false){
+            trabajoBuscado = null
+        }
+    }
+
     fun limpiarErrorMensage(){
         if(cargando == false){
             mensageError = null
@@ -470,6 +476,28 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun editarTrabajo(trabajo: TrabajoDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.editarTrabajo(trabajo)
+                if (result.isSuccessful) {
+                    trabajoBuscado = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
     fun crearTrabajador(trabajdor: TrabajadorDTO) {
         viewModelScope.launch {
             cargando = true
@@ -545,6 +573,28 @@ class EmpresaViewModel : ViewModel() {
                 var result = api.crearRegistroMaterial(registro)
                 if (result.isSuccessful) {
                     registroMaterialBuscado = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
+    fun crearTrabajo(trabajo: TrabajoDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.crearTrabajo(trabajo)
+                if (result.isSuccessful) {
+                    trabajoBuscado = result.body()
                 } else {
                     mensageError = obtenerMensajeError(result)
                 }

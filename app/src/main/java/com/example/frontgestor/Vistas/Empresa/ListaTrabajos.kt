@@ -131,7 +131,10 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                             tint = Color(0xFF2BB673)
                         )
                     }
-                    IconButton(onClick = { onCrearNuevo()}) {
+                    IconButton(onClick = {
+                        empresaViewModel.limpiarTrabajoBuscado()
+                        onCrearNuevo()
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Añadir trabajador",

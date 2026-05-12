@@ -41,7 +41,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -72,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Modelos.TrabajadorDTO
+import com.example.frontgestor.Modelos.TrabajoDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
@@ -134,6 +138,10 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
+
+    //variable para dropdowbn de estado
+    var expandido by remember { mutableStateOf(false) }
+    val estados = listOf("Espera", "Proceso", "Finalizado", "Revisión")
 
     LaunchedEffect(Unit){
         empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
@@ -249,21 +257,47 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                 )
 
 
-
-                OutlinedTextField(
-                    value = estado,
-                    onValueChange = { estado = it },
-                    label = { Text("Estado ") },
+                ExposedDropdownMenuBox(
+                    expanded = expandido,
+                    onExpandedChange = { expandido = !expandido },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                        .padding(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = estado,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Estados") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                        ),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
                     )
-                )
+
+                    ExposedDropdownMenu(
+                        expanded = expandido,
+                        onDismissRequest = { expandido = false },
+                        modifier = Modifier.background(Color.White)
+                    ) {
+                        estados?.forEach { estadox ->
+                            DropdownMenuItem(
+                                text = { Text(estadox) },
+                                onClick = {
+                                    estado = estadox
+                                    expandido = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                            )
+                        }
+                    }
+                }
 
 
 
@@ -670,16 +704,26 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
             Button(
                 onClick = {
                     empresaViewModel.limpiarErrorMensage();
-                    if(titulo.isNotEmpty() && descripcion.isNotEmpty() && fechaInicial.isNotEmpty() && fechaFinal.isNotEmpty() && estado.isNotEmpty()){
-                        /*val trabajador
+                    var estado = "Proceso"
+                    if(estado.equals( "Proceso")){
+                        estado = "P"
+                    }else if(estado.equals("Finalizado")){
+                        estado = "F"
+                    }else if(estado.equals("Espera")){
+                        estado = "E"
+                    }else if(estado.equals("Revisión")){
+                        estado = "R"
+                    }
+                    if(titulo.isNotEmpty() && descripcion.isNotEmpty() && fechaInicial.isNotEmpty()  && estado.isNotEmpty()){
+                        val trabajo = TrabajoDTO(idTrabajo , idEmpresa , titulo , descripcion ,  fechaInicial , fechaFinal ,anotacion , estado )
                         if(esEdicion){
-                            empresaViewModel.editarTrabajador(trabajador)
+                            empresaViewModel.editarTrabajo(trabajo)
                         }else{
-                            empresaViewModel.crearTrabajador(trabajador)
-                        }*/
+                            empresaViewModel.crearTrabajo(trabajo)
+                        }
                     }else{
                         lanzador.launch {
-                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
+                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el titulo , descripcion o fecha inicio ")
                         }
                     }
                 },

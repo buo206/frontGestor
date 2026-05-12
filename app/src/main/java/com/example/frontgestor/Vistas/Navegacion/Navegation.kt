@@ -210,7 +210,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.navigate(AppDestination.FormularioTrabajo.route + "/true")
                 },
-                {},
+                {
+                    navController.navigate(AppDestination.FormularioTrabajo.route + "/false")
+                },
                 {
                     navController.popBackStack()
                     navController.navigate(AppDestination.ListaMateriales.route)
