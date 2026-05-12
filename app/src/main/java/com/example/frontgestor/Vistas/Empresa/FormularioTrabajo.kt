@@ -136,8 +136,6 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
     //borramos el mensage para que no haya problema al salir sin guardar
     empresaViewModel.limpiarErrorMensage()
-    //y con los materiales para no ver otros registro de materiales que no sean los de este trabajo
-    empresaViewModel.limpiarListaMateriales()
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }

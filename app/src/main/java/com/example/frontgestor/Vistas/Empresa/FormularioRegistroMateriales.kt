@@ -91,11 +91,11 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
     LaunchedEffect(Unit) {
         empresaViewModel.listarMateriales(session.getEmpresaId())
+        empresaViewModel.listarTrabajadores(session.getEmpresaId())
     }
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
-
 
     //para material
     var expandido by remember { mutableStateOf(false) }
