@@ -558,7 +558,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                         ) ,
                         onClick = {
                             empresaViewModel.setRegistroMaterial(registroMaterial)
-                            empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador , registroMaterial.idTrabajo , registroMaterial.idMaterial)
+                            empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador ?: 0 , registroMaterial.idTrabajo ?: 0 , registroMaterial.idMaterial ?: 0)
                             onEditarRegistroMateriales()
                         }
                     ) {

@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Modelos.MaterialDTO
+import com.example.frontgestor.Modelos.RegistroMaterialDTO
 import com.example.frontgestor.Modelos.RegistroTrabajoDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.R
@@ -116,7 +117,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     val idsAsignadosT = empresaViewModel.registrosTrabajo?.map { it.idTrabajador } ?: emptyList()
 
     // Filtramos
-    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador !in idsAsignadosT }
+    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador in idsAsignadosT }
 
 
     Box(
@@ -233,10 +234,8 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             .padding(8.dp)  ,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
 
@@ -262,10 +261,8 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             .padding(8.dp)  ,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
                 }else{
@@ -289,8 +286,8 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             label = { Text("Materiales disponible") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                                unfocusedBorderColor = Color.Gray,
+                                disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                                disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                             ),
                             modifier = Modifier
                                 .menuAnchor()
@@ -421,7 +418,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = fechaHora,
                     onValueChange = { fechaHora= it },
-                    label = { Text("Titulo") },
+                    label = { Text("Fecha y hora") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -478,21 +475,39 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    /*
                     empresaViewModel.limpiarErrorMensage()
 
-                    if(esEdicion &&  cantidad > 1){
-                        val registroTrabajo = RegistroTrabajoDTO(idTrabajo , "" ,idTrabajador ,nombreTrabajador , apellidosTrabajador ,rol)
-                        empresaViewModel.editarRegistroTrabajo(registroTrabajo)
-                    }else if(!esEdicion &&  != null  &&  rol.isNotEmpty()){
-                        val registroTrabajo = RegistroTrabajoDTO(idTrabajo , "" ,trabajadorSeleccionado!!.idTrabajador ,"" , "" ,rol)
-                        empresaViewModel.crearRegistroTrabajo(registroTrabajo)
+                    if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
+                        val registroMaterial = RegistroMaterialDTO(
+                            idRegistro,
+                            idTrabajo,
+                            "",
+                            idMaterial,
+                            "",
+                            idTrabajador,
+                            "",
+                            fechaHora,
+                            cantidad
+                        )
+                        empresaViewModel.editarRegistroMaterial(registroMaterial)
+                    }else if(!esEdicion && cantidad > 0   && fechaHora.isNotEmpty() && trabajadorSeleccionado != null && materialSeleccionado != null){
+                        val registroMaterial = RegistroMaterialDTO(
+                            idRegistro,
+                            idTrabajo,
+                            "",
+                            materialSeleccionado?.idMaterial,
+                            "",
+                            trabajadorSeleccionado?.idTrabajador,
+                            "",
+                            fechaHora,
+                            cantidad
+                        )
+                        empresaViewModel.crearRegistroMaterial(registroMaterial)
                     }else{
                         lanzador.launch {
-                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
+                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la cantidad (minimo 1) y la fecha(YYY-MM-DD)")
                         }
                     }
-                    */
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(

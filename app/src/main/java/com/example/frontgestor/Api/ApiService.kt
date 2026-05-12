@@ -86,6 +86,12 @@ interface ApiService {
     @POST("registroTrabajo/alta")
     suspend fun crearRegistroTrabajo(@Body registoTrabajoDTO: RegistroTrabajoDTO): Response<RegistroTrabajoDTO>
 
+    @POST("registroMaterial/editar")
+    suspend fun editarRegistroMaterial(@Body registoMaterialDTO: RegistroMaterialDTO): Response<RegistroMaterialDTO>
+
+    @POST("registroMaterial/alta")
+    suspend fun crearRegistroMaterial(@Body registoMaterialDTO: RegistroMaterialDTO): Response<RegistroMaterialDTO>
+
     companion object {
         private var apiService: ApiService? = null
 

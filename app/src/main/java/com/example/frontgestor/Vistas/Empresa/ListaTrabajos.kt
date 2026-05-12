@@ -229,6 +229,7 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                             ) ,
                             onClick = {
                                 empresaViewModel.buscarTrabajo(trabajo.idTrabajo)
+                                empresaViewModel.limpiarListaMateriales()
                                 onDetalle()
                             }
                         ) {

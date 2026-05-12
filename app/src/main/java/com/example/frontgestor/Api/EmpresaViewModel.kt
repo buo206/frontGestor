@@ -14,7 +14,9 @@ import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.Modelos.TrabajoDTO
 import com.example.frontgestor.Modelos.TrabajoListaDTO
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 
 class EmpresaViewModel : ViewModel() {
@@ -68,7 +70,7 @@ class EmpresaViewModel : ViewModel() {
                 if(result.isSuccessful){
                     empresa = result.body()
                 }else{
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -92,7 +94,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registrosTrabajador = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -114,7 +116,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajadorBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -136,7 +138,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajoBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -158,7 +160,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registroTrabajobuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -188,7 +190,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registrosMateriales = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -210,7 +212,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registroMaterialBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError =
@@ -243,7 +245,7 @@ class EmpresaViewModel : ViewModel() {
 
     fun limpiarListaMateriales(){
         if(cargando == false){
-            materiales = null
+            registrosMateriales = null
         }
     }
 
@@ -252,6 +254,7 @@ class EmpresaViewModel : ViewModel() {
             registroTrabajobuscado = null
         }
     }
+
 
     fun limpiarRegistroMaterialBuscado(){
         if(cargando == false){
@@ -275,7 +278,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajadores = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -297,7 +300,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajos = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -319,7 +322,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     materiales = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -341,7 +344,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registrosMateriales = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -363,7 +366,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registrosTrabajo = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -387,7 +390,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajadorBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -409,7 +412,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     materialBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -431,7 +434,30 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registroTrabajobuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
+
+    fun editarRegistroMaterial(registro: RegistroMaterialDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.editarRegistroMaterial(registro)
+                if (result.isSuccessful) {
+                    registroMaterialBuscado = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -453,7 +479,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     trabajadorBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -475,7 +501,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     materialBuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -497,7 +523,7 @@ class EmpresaViewModel : ViewModel() {
                 if (result.isSuccessful) {
                     registroTrabajobuscado = result.body()
                 } else {
-                    mensageError = result.errorBody()?.string()
+                    mensageError = obtenerMensajeError(result)
                 }
             } catch (e: IOException) {
                 mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
@@ -508,5 +534,44 @@ class EmpresaViewModel : ViewModel() {
             }
             cargando = false
         }
+    }
+
+
+    fun crearRegistroMaterial(registro: RegistroMaterialDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.crearRegistroMaterial(registro)
+                if (result.isSuccessful) {
+                    registroMaterialBuscado = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+}
+
+private fun obtenerMensajeError(response: Response<*>): String {
+    val errorBody = response.errorBody()?.string()
+        ?: return "Error desconocido"
+
+    return try {
+        val json = JSONObject(errorBody)
+
+        json.optString("message")
+            .ifBlank { json.optString("detail") }
+            .ifBlank { json.optString("error") }
+            .ifBlank { errorBody }
+    } catch (e: Exception) {
+        errorBody
     }
 }

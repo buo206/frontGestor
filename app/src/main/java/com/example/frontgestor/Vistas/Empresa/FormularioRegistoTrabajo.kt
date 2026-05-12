@@ -65,7 +65,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
     val idTrabajo = empresaViewModel.registroTrabajobuscado?.idTrabajo ?: empresaViewModel.trabajoBuscado?.idTrabajo
     val idTrabajador = empresaViewModel.registroTrabajobuscado?.idTrabajador  ?: 0
     val nombreTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?:  ""
-    val apellidosTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?: ""
+    val apellidosTrabajador = empresaViewModel.registroTrabajobuscado?.apellidosTrabajador ?: ""
     var rol by remember { mutableStateOf(empresaViewModel.registroTrabajobuscado?.rol ?: "") }
 
 
@@ -187,10 +187,8 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                             .padding(8.dp)  ,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
                     OutlinedTextField(
@@ -202,10 +200,8 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                             .padding(8.dp)  ,
                         enabled = false,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            unfocusedBorderColor = Color.Gray,
-                            focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
                 }else{
