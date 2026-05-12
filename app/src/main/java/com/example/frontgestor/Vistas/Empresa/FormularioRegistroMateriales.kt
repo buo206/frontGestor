@@ -54,6 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroMaterialDTO
@@ -62,7 +63,10 @@ import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -85,7 +89,10 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     val idTrabajador = empresaViewModel.registroMaterialBuscado?.idTrabajador  ?: 0
     val nombreTrabajador = empresaViewModel.registroMaterialBuscado?.nombreTrabajador ?:  ""
     var cantidad by remember { mutableStateOf(empresaViewModel.registroMaterialBuscado?.cantidad ?: 1) }
-    var fechaHora by remember { mutableStateOf(empresaViewModel.registroMaterialBuscado?.fecha ?: LocalDateTime.now().toString()) }
+    var fechaHora = empresaViewModel.registroMaterialBuscado?.fecha ?: LocalDateTime.now().toString()
+    var fecha  by remember { mutableStateOf(fechaHora.substring(0,10))}
+    var hora by remember { mutableStateOf (fechaHora.substring(11,13).toInt() )}
+    var minuto by remember { mutableStateOf(fechaHora.substring(14,16).toInt())}
 
 
 
@@ -402,7 +409,11 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             .width(100.dp)
                             .padding(horizontal = 8.dp),
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        label = { Text("Stock", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+                        label = { Text("Stock", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                        )
+
                     )
 
                     // Botón Más
@@ -416,9 +427,10 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
 
                 OutlinedTextField(
-                    value = fechaHora,
-                    onValueChange = { fechaHora= it },
-                    label = { Text("Fecha y hora") },
+                    value = fecha,
+                    onValueChange = { fecha = it },
+                    label = { Text("Fecha") },
+                    placeholder = { Text("YYYY-MM-DD") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -429,8 +441,54 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                         cursorColor = colorResource(id = R.color.personalizadoVerdoso)
                     )
                 )
+                Row{
+                    OutlinedTextField(
+                        value = hora.toString(),
+                        onValueChange = {
+                            val newValue = it.filter { char -> char.isDigit() }
+                            hora = newValue.toIntOrNull() ?: 0
+                            if(hora > 24){
+                                hora = 24
+                            }else if(hora < 0){
+                                hora = 0
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .width(100.dp)
+                            .padding(horizontal = 8.dp),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                        label = { Text("Hora", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                        )
+                    )
 
 
+                    OutlinedTextField(
+                        value = minuto.toString(),
+                        onValueChange = {
+                            val newValue = it.filter { char -> char.isDigit() }
+                            minuto = newValue.toIntOrNull() ?: 0
+                            if(minuto > 59){
+                                minuto = 59
+                            }else if(minuto < 0){
+                                minuto = 0
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .width(100.dp)
+                            .padding(horizontal = 8.dp),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                        label = { Text("Minutos", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            unfocusedBorderColor = Color.Gray,
+                        )
+                    )
+                }
 
 
 
@@ -476,6 +534,20 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
             Button(
                 onClick = {
                     empresaViewModel.limpiarErrorMensage()
+
+                    var fechaHora = fecha +"T"
+                    if(hora <10){
+                        fechaHora += "0"+hora+":"
+                    }else{
+                        fechaHora += hora.toString() + ":"
+                    }
+
+                    if(minuto < 10 ){
+                        fechaHora += "0"+minuto+":00"
+                    }else{
+                        fechaHora+= minuto.toString()+":00"
+                    }
+
 
                     if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
                         val registroMaterial = RegistroMaterialDTO(
