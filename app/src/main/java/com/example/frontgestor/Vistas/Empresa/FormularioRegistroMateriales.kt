@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,9 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -39,6 +43,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -127,6 +132,13 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador in idsAsignadosT }
 
 
+    //variables para el selector de fechas
+    var mostrarPickerInicial by remember { mutableStateOf(false) }
+
+    val datePickerStateInicial = rememberDatePickerState(
+        initialSelectedDateMillis = System.currentTimeMillis()
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -153,8 +165,9 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
             if (mostrarDialogoSalida) {
                 AlertDialog(
                     onDismissRequest = { mostrarDialogoSalida = false },
-                    title = { Text(text = "Cambios sin guardar") },
-                    text = { Text(text = "¿Estás seguro de que quieres salir? Se perderán los cambios que no hayas guardado.") },
+                    containerColor = colorResource(R.color.personalizadoVerdoso),
+                    title = { Text(text = "Cambios sin guardar" , color = Color.White) },
+                    text = { Text(text = "¿Estás seguro de que quieres salir? Se perderán los cambios que no hayas guardado."  , color = Color.White) },
                     confirmButton = {
                         TextButton(
                             onClick = {
@@ -162,7 +175,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                                 onback()
                             }
                         ) {
-                            Text("Salir sin guardar", color = Color.Red)
+                            Text("Salir sin guardar", color = Color.Green)
                         }
                     },
                     dismissButton = {
@@ -171,7 +184,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                         ) {
                             Text(
                                 "Permanecer y arreglar",
-                                color = colorResource(id = R.color.personalizadoVerdoso)
+                                color = Color.Green
                             )
                         }
                     }
@@ -426,21 +439,73 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                 }
 
 
-                OutlinedTextField(
-                    value = fecha,
-                    onValueChange = { fecha = it },
-                    label = { Text("Fecha") },
-                    placeholder = { Text("YYYY-MM-DD") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)  ,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)) {
+                    OutlinedTextField(
+                        value = fecha,
+                        onValueChange = { },
+                        label = { Text("Fecha") },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                            cursorColor = Color.Transparent
+                        )
                     )
-                )
+                    Box(modifier = Modifier
+                        .matchParentSize()
+                        .clickable { mostrarPickerInicial = true }
+                    )
+                }
+
+                if (mostrarPickerInicial) {
+                    DatePickerDialog(
+                        onDismissRequest = { mostrarPickerInicial = false },
+                        confirmButton = {
+                            Button(onClick = {
+                                val inicioMs = datePickerStateInicial.selectedDateMillis ?: 0L
+                                fecha = inicioMs.aFechaString()
+                                mostrarPickerInicial = false
+                            },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Green,
+                                    contentColor = Color.White
+                                )
+
+                            ) { Text("Aceptar") }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { mostrarPickerInicial = false },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Green,
+                                    contentColor = Color.White
+                                )
+                            ) { Text("Cancelar") }
+                        },
+                        colors = DatePickerDefaults.colors(
+                            containerColor = colorResource(id = R.color.personalizadoVerdoso),
+                            titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
+                            headlineContentColor = colorResource(id = R.color.personalizadoVerdoso)
+                        )
+                    ) {
+                        DatePicker(
+                            state = datePickerStateInicial,
+                            colors = DatePickerDefaults.colors(
+                                containerColor = colorResource(id = R.color.personalizadoVerdoso),
+                                titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
+                                headlineContentColor = Color.White ,
+                                selectedDayContainerColor = Color.Green,
+                                selectedDayContentColor = Color.White,
+                                todayContentColor = Color.White,
+                                todayDateBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+
+                                )
+                        )
+                    }
+                }
+
                 Row{
                     OutlinedTextField(
                         value = hora.toString(),
@@ -547,7 +612,6 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                     }else{
                         fechaHora+= minuto.toString()+":00"
                     }
-
 
                     if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
                         val registroMaterial = RegistroMaterialDTO(

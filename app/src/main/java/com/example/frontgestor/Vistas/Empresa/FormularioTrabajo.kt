@@ -129,11 +129,6 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     )
     val datePickerStateFinal = rememberDatePickerState()
 
-
-    //variable para saber si mosrtrar las opciones/datos a avanzadas
-    var mostrarOpcionesAvanzadas by remember { mutableStateOf(false) }
-
-
     //borramos el mensage para que no haya problema al salir sin guardar
     empresaViewModel.limpiarErrorMensage()
 
