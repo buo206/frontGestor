@@ -4,16 +4,24 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -21,6 +29,9 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
@@ -40,18 +51,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.EmpresaViewModel
+import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroTrabajoDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
+fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     empresaViewModel: EmpresaViewModel ,
     onback: () -> Unit ,
     session: SessionManager ,
@@ -62,30 +77,46 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idTrabajo = empresaViewModel.registroTrabajobuscado?.idTrabajo ?: empresaViewModel.trabajoBuscado?.idTrabajo
-    val idTrabajador = empresaViewModel.registroTrabajobuscado?.idTrabajador  ?: 0
-    val nombreTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?:  ""
-    val apellidosTrabajador = empresaViewModel.registroTrabajobuscado?.nombreTrabajador ?: ""
-    var rol by remember { mutableStateOf(empresaViewModel.registroTrabajobuscado?.rol ?: "") }
+    val idRegistro = empresaViewModel.registroMaterialBuscado?.idRegistro ?: 0
+    val idMaterial = empresaViewModel.registroMaterialBuscado?.idMaterial ?: 0
+    val nombrematerial = empresaViewModel.registroMaterialBuscado?.tituloMaterial ?: "";
+    val idTrabajo = empresaViewModel.registroMaterialBuscado?.idTrabajo ?: empresaViewModel.trabajoBuscado?.idTrabajo
+    val idTrabajador = empresaViewModel.registroMaterialBuscado?.idTrabajador  ?: 0
+    val nombreTrabajador = empresaViewModel.registroMaterialBuscado?.nombreTrabajador ?:  ""
+    var cantidad by remember { mutableStateOf(empresaViewModel.registroMaterialBuscado?.cantidad ?: 1) }
+    var fechaHora by remember { mutableStateOf(empresaViewModel.registroMaterialBuscado?.fecha ?: LocalDateTime.now().toString()) }
+
 
 
 
     LaunchedEffect(Unit) {
-        empresaViewModel.listarTrabajadores(session.getEmpresaId())
+        empresaViewModel.listarMateriales(session.getEmpresaId())
     }
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
 
 
+    //para material
     var expandido by remember { mutableStateOf(false) }
+    var materialSeleccionado by remember { mutableStateOf< MaterialDTO?>(null) }
+
+    val todosLosMateriales = empresaViewModel.materiales ?: emptyList()
+    val idsAsignados = empresaViewModel.registrosMateriales?.map { it.idMaterial } ?: emptyList()
+
+    // Filtramos
+    val materialesDisponibles = todosLosMateriales.filter { it.idMaterial !in idsAsignados }
+
+
+    //para trabajador
+    var expandidoTrabajadores by remember { mutableStateOf(false) }
     var trabajadorSeleccionado by remember { mutableStateOf< TrabajadorListaDTO?>(null) }
 
     val todosLosTrabajadores = empresaViewModel.trabajadores ?: emptyList()
-    val idsAsignados = empresaViewModel.registrosTrabajo?.map { it.idTrabajador } ?: emptyList()
+    val idsAsignadosT = empresaViewModel.registrosTrabajo?.map { it.idTrabajador } ?: emptyList()
 
     // Filtramos
-    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador !in idsAsignados }
+    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador !in idsAsignadosT }
 
 
     Box(
@@ -147,6 +178,21 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
+
+                OutlinedTextField(
+                    value = idRegistro.toString(),
+                    onValueChange = {  },
+                    label = { Text("Id Registro") },
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                        disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
                 OutlinedTextField(
                     value = idTrabajo.toString(),
                     onValueChange = {  },
@@ -163,7 +209,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
 
 
 
-                if(idTrabajador != 0){
+                if(idTrabajador != 0 && idMaterial != 0){
                     OutlinedTextField(
                         value = idTrabajador.toString(),
                         onValueChange = {  },
@@ -193,10 +239,24 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                             cursorColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
+
                     OutlinedTextField(
-                        value = apellidosTrabajador,
+                        value = idMaterial.toString(),
+                        onValueChange = {  },
+                        label = { Text("ID Material") },
+                        enabled = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)  ,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
+                        )
+                    )
+                    OutlinedTextField(
+                        value = nombrematerial,
                         onValueChange = { },
-                        label = { Text("Apellidos Trabajador") },
+                        label = { Text("Nombre material") },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)  ,
@@ -210,7 +270,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                     )
                 }else{
                     Text(
-                        "Asignar nuevo trabajador",
+                        "Asignar nuevo Material",
                         modifier = Modifier.padding(8.dp),
                         color = Color.Green
                     )
@@ -218,6 +278,60 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                     ExposedDropdownMenuBox(
                         expanded = expandido,
                         onExpandedChange = { expandido = !expandido },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = materialSeleccionado?.let { "${it.titulo}" } ?: "Selecciona un material",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Materiales disponible") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                                unfocusedBorderColor = Color.Gray,
+                            ),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expandido,
+                            onDismissRequest = { expandido = false },
+                            modifier = Modifier.background(Color.White)
+                        ) {
+                            if (materialesDisponibles.isNullOrEmpty()) {
+                                DropdownMenuItem(
+                                    text = { Text("No hay materiales disponibles") },
+                                    onClick = { expandido = false }
+                                )
+                            } else {
+                                materialesDisponibles?.forEach { material ->
+                                    DropdownMenuItem(
+                                        text = { Text("${material.idMaterial}.${material.titulo} con stock : ${material.stock} ") },
+                                        onClick = {
+                                            materialSeleccionado = material
+                                            expandido = false
+                                        },
+                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+
+                    Text(
+                        "Asignar trabajador",
+                        modifier = Modifier.padding(8.dp),
+                        color = Color.Green
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandidoTrabajadores,
+                        onExpandedChange = { expandidoTrabajadores = !expandidoTrabajadores },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
@@ -238,14 +352,14 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                         )
 
                         ExposedDropdownMenu(
-                            expanded = expandido,
-                            onDismissRequest = { expandido = false },
+                            expanded = expandidoTrabajadores,
+                            onDismissRequest = { expandidoTrabajadores = false },
                             modifier = Modifier.background(Color.White)
                         ) {
                             if (trabajadoresDisponibles.isNullOrEmpty()) {
                                 DropdownMenuItem(
                                     text = { Text("No hay trabajadores disponibles") },
-                                    onClick = { expandido = false }
+                                    onClick = { expandidoTrabajadores = false }
                                 )
                             } else {
                                 trabajadoresDisponibles?.forEach { trabajador ->
@@ -253,7 +367,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                                         text = { Text("${trabajador.idTrabajador}.${trabajador.nombre} con email : ${trabajador.email} ") },
                                         onClick = {
                                             trabajadorSeleccionado = trabajador
-                                            expandido = false
+                                            expandidoTrabajadores = false
                                         },
                                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                                     )
@@ -263,11 +377,51 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                     }
                 }
 
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    // Botón Menos
+                    IconButton(
+                        onClick = { if (cantidad > 0) cantidad-- },
+                        modifier = Modifier.background(colorResource(id = R.color.personalizadoVerdoso), shape = RoundedCornerShape(8.dp))
+                    ) {
+                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Restar", tint = Color.White)
+                    }
+
+                    // Cuadro de texto para ver/editar número
+                    OutlinedTextField(
+                        value = cantidad.toString(),
+                        onValueChange = {
+                            // Solo permite números y actualiza el estado
+                            val newValue = it.filter { char -> char.isDigit() }
+                            cantidad = newValue.toIntOrNull() ?: 0
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .width(100.dp)
+                            .padding(horizontal = 8.dp),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+                        label = { Text("Stock", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+                    )
+
+                    // Botón Más
+                    IconButton(
+                        onClick = { cantidad++ },
+                        modifier = Modifier.background(colorResource(id = R.color.personalizadoVerdoso), shape = RoundedCornerShape(8.dp))
+                    ) {
+                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Sumar", tint = Color.White)
+                    }
+                }
+
 
                 OutlinedTextField(
-                    value = rol,
-                    onValueChange = { rol = it },
-                    label = { Text("Rol o cargo") },
+                    value = fechaHora,
+                    onValueChange = { fechaHora= it },
+                    label = { Text("Titulo") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -324,12 +478,13 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
+                    /*
                     empresaViewModel.limpiarErrorMensage()
 
-                    if(esEdicion &&  rol.isNotEmpty()){
+                    if(esEdicion &&  cantidad > 1){
                         val registroTrabajo = RegistroTrabajoDTO(idTrabajo , "" ,idTrabajador ,nombreTrabajador , apellidosTrabajador ,rol)
                         empresaViewModel.editarRegistroTrabajo(registroTrabajo)
-                    }else if(!esEdicion && trabajadorSeleccionado != null  &&  rol.isNotEmpty()){
+                    }else if(!esEdicion &&  != null  &&  rol.isNotEmpty()){
                         val registroTrabajo = RegistroTrabajoDTO(idTrabajo , "" ,trabajadorSeleccionado!!.idTrabajador ,"" , "" ,rol)
                         empresaViewModel.crearRegistroTrabajo(registroTrabajo)
                     }else{
@@ -337,7 +492,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
                         }
                     }
-
+                    */
                 },
                 modifier = Modifier.fillMaxWidth() ,
                 colors = ButtonDefaults.buttonColors(

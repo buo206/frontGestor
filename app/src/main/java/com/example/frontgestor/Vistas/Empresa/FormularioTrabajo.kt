@@ -90,7 +90,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     session: SessionManager ,
     esEdicion: Boolean ,
     onEditarRegistroTrabajador : () -> Unit,
-    onCrearRegistroTrabajador: () -> Unit
+    onCrearRegistroTrabajador: () -> Unit ,
+    onEditarRegistroMateriales: () -> Unit,
+    onCrearRegistroMateriales: () -> Unit
 ){
     //variables del scnackba
     val snackbarEstado = remember { SnackbarHostState() }
@@ -527,7 +529,8 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {
-
+                        empresaViewModel.limpiarRegistroMaterialBuscado()
+                        onCrearRegistroMateriales()
                     }){
                         Icon(
                             imageVector = Icons.Filled.Add,
@@ -556,6 +559,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                             contentColor = Color.White
                         ) ,
                         onClick = {
+                            empresaViewModel.setRegistroMaterial(registroMaterial)
+                            empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador , registroMaterial.idTrabajo , registroMaterial.idMaterial)
+                            onEditarRegistroMateriales()
                         }
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {

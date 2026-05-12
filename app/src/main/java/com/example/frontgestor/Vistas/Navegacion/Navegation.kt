@@ -17,6 +17,7 @@ import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioMaterial
+import com.example.frontgestor.Vistas.Empresa.FormularioRegistroMateriales
 import com.example.frontgestor.Vistas.Empresa.FormularioRegistroTrabajo
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioTrabajo
@@ -248,6 +249,10 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 },
                 {
                     navController.navigate(AppDestination.FormularioRegistroTrabajo.route + "/false")
+                },{
+                    navController.navigate(AppDestination.FormularioRegistroMateriales.route + "/true")
+                },{
+                    navController.navigate(AppDestination.FormularioRegistroMateriales.route + "/false")
                 }
             )
         }
@@ -268,6 +273,24 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 esEdicion
             )
         }
+
+
+        composable(
+            route = AppDestination.FormularioRegistroMateriales.route + "/{esEdicion}",
+            arguments = listOf(
+                navArgument("esEdicion") { type = NavType.BoolType }
+            )
+        ){ backStackEntry ->
+            val esEdicion = backStackEntry.arguments?.getBoolean("esEdicion") ?: true
+            FormularioRegistroMateriales(modifier, empresaViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion ,
+                esEdicion
+            )
+        }
+
         //trabajador
 
         composable(route = AppDestination.MenuTrabajador.route){

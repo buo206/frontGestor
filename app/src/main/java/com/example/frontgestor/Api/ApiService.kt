@@ -62,6 +62,9 @@ interface ApiService {
     @GET("registroTrabajo/buscar/{idTrabajo}/{idTrabajador}")
     suspend fun buscarRegistroTrabajador(@Path("idTrabajo"  ) idTrabajo: Int , @Path("idTrabajador"  ) idTrabajador: Int ): Response<RegistroTrabajoDTO>
 
+    @GET("registroMaterial/buscarRegistroTodo/{idTrabajador}/{idTrabajo}/{idMaterial}")
+    suspend fun buscarRegistroMaterialTodo(@Path("idTrabajador"  ) idTrabajador: Int ,@Path("idTrabajo"  ) idTrabajo: Int  ,@Path("idMaterial"  ) idMaterial: Int ): Response<RegistroMaterialDTO>
+
 
     //editar o altas
     @POST("trabajador/editar")
@@ -79,6 +82,9 @@ interface ApiService {
 
     @POST("registroTrabajo/editar")
     suspend fun editarRegistroTrabajo(@Body registoTrabajoDTO: RegistroTrabajoDTO): Response<RegistroTrabajoDTO>
+
+    @POST("registroTrabajo/alta")
+    suspend fun crearRegistroTrabajo(@Body registoTrabajoDTO: RegistroTrabajoDTO): Response<RegistroTrabajoDTO>
 
     companion object {
         private var apiService: ApiService? = null
