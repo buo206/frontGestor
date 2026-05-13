@@ -105,8 +105,7 @@ fun FormularioTrabajoTrabajador(modifier: Modifier = Modifier ,
 
     var fechaInicial by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.fechaInicio ?: "") }
 
-    //borramos el mensage para que no haya problema al salir sin guardar
-    trabajadorViewModel.limpiarErrorMensage()
+
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
@@ -116,6 +115,8 @@ fun FormularioTrabajoTrabajador(modifier: Modifier = Modifier ,
     val estados = listOf("Espera", "Proceso", "Revisión")
 
     LaunchedEffect(Unit){
+        //borramos el mensage para que no haya problema al salir sin guardar
+        trabajadorViewModel.limpiarErrorMensage()
         trabajadorViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
     }
 
@@ -496,8 +497,9 @@ fun FormularioTrabajoTrabajador(modifier: Modifier = Modifier ,
 
 
             trabajadorViewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
 
         }

@@ -56,7 +56,8 @@ fun MenuTrabajador(modifier: Modifier = Modifier,
     sesion : SessionManager ,
     trabajadorViewModel : TrabajadorViewModel ,
     onBack : () -> Unit ,
-    onNavigateToTrabajos : () -> Unit
+    onNavigateToTrabajos : () -> Unit ,
+    onEditar : () -> Unit
 ){
     //variables del navigationBar
     var selectedItem by remember { mutableStateOf(0) }
@@ -150,15 +151,6 @@ fun MenuTrabajador(modifier: Modifier = Modifier,
                         Text("Ubicación: ${trabajadorViewModel.trabajador?.dirreccion ?: "No disponible"}")
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Text("Telefono: ${trabajadorViewModel.trabajador?.numeroTelefono ?: "No disponible"}")
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text("Fecha de alta: ${trabajadorViewModel.trabajador?.fechaCreacion ?: "No disponible"}")
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text("Dni: ${trabajadorViewModel.trabajador?.dni ?: "No disponible"}")
-                        Spacer(modifier = Modifier.height(8.dp))
-
                     }
                 }
 
@@ -166,7 +158,11 @@ fun MenuTrabajador(modifier: Modifier = Modifier,
 
 
                 Button(
-                    onClick = { /* editar perfil */ },
+                    onClick = {
+                        if(trabajadorViewModel.trabajador != null){
+                            onEditar()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth() ,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.personalizadoVerdoso),

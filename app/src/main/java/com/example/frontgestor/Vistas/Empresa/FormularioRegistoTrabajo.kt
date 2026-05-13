@@ -71,6 +71,7 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
 
 
     LaunchedEffect(Unit) {
+        empresaViewModel.limpiarErrorMensage()
         empresaViewModel.listarTrabajadores(session.getEmpresaId())
     }
 
@@ -346,8 +347,9 @@ fun FormularioRegistroTrabajo(modifier: Modifier = Modifier ,
 
 
             empresaViewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
 
         }

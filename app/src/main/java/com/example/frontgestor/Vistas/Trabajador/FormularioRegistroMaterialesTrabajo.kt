@@ -107,6 +107,7 @@ fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
 
 
     LaunchedEffect(Unit) {
+        trabajadorViewModel.limpiarErrorMensage()
         trabajadorViewModel.listarMateriales(session.getEmpresaId())
     }
 
@@ -445,7 +446,7 @@ fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
                         idTrabajador = session.getUserId()
                     }
 
-                    if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
+                    if(esEdicion  && fechaHora.isNotEmpty() ){
                         val registroMaterial = RegistroMaterialDTO(
                             idRegistro,
                             idTrabajo,
@@ -458,7 +459,7 @@ fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
                             cantidad
                         )
                         trabajadorViewModel.editarRegistroMaterial(registroMaterial)
-                    }else if(!esEdicion && cantidad > 0   && fechaHora.isNotEmpty()  && materialSeleccionado != null){
+                    }else if(!esEdicion && fechaHora.isNotEmpty()  && materialSeleccionado != null){
                         val registroMaterial = RegistroMaterialDTO(
                             idRegistro,
                             idTrabajo,
@@ -473,7 +474,7 @@ fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
                         trabajadorViewModel.crearRegistroMaterial(registroMaterial)
                     }else{
                         lanzador.launch {
-                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la cantidad (minimo 1) y la fecha(YYY-MM-DD)")
+                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la fecha(YYY-MM-DD)")
                         }
                     }
                 },
@@ -488,8 +489,9 @@ fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
 
 
             trabajadorViewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
 
         }

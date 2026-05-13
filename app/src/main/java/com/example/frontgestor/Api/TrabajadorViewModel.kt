@@ -278,6 +278,29 @@ class TrabajadorViewModel : ViewModel() {
             cargando = false
         }
     }
+
+    fun editarTrabajador(trabajdor: TrabajadorDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.editarTrabajador(trabajdor)
+                if (result.isSuccessful) {
+                    trabajador = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
 }
 
 

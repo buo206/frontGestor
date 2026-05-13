@@ -29,6 +29,7 @@ import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajos
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
+import com.example.frontgestor.Vistas.Trabajador.FormularioEditarTrabajador
 import com.example.frontgestor.Vistas.Trabajador.FormularioRegistroMaterialesTrabajo
 import com.example.frontgestor.Vistas.Trabajador.FormularioTrabajoTrabajador
 import com.example.frontgestor.Vistas.Trabajador.ListaTrabajosTrabajador
@@ -310,6 +311,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 {
                     navController.navigate(AppDestination.ListaTrabajosTrabajador.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.FormularioEditarTrabajador.route)
                 }
             )
         }
@@ -356,6 +360,17 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 } ,
                 sesion ,
                 esEdicion
+            )
+        }
+
+
+        composable(route = AppDestination.FormularioEditarTrabajador.route){
+            FormularioEditarTrabajador(modifier ,
+                trabajadorViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion
             )
         }
     }

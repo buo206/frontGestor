@@ -120,8 +120,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     )
     val datePickerStateFinal = rememberDatePickerState()
 
-    //borramos el mensage para que no haya problema al salir sin guardar
-    empresaViewModel.limpiarErrorMensage()
+
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
@@ -131,6 +130,8 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     val estados = listOf("Espera", "Proceso", "Finalizado", "Revisión")
 
     LaunchedEffect(Unit){
+        //borramos el mensage para que no haya problema al salir sin guardar
+        empresaViewModel.limpiarErrorMensage()
         empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
         empresaViewModel.listarRegistrosTrabajo(idTrabajo)
     }
@@ -725,8 +726,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
 
             empresaViewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
 
         }

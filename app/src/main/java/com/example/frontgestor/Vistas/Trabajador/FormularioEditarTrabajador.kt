@@ -1,36 +1,22 @@
-package com.example.frontgestor.Vistas.Empresa
+package com.example.frontgestor.Vistas.Trabajador
 
 import android.os.Build
-import android.se.omapi.Session
-import androidx.activity.result.launch
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.copy
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Snackbar
@@ -47,16 +33,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 import com.example.frontgestor.Api.EmpresaViewModel
-import com.example.frontgestor.Modelos.MaterialDTO
+import com.example.frontgestor.Api.TrabajadorViewModel
 import com.example.frontgestor.Modelos.TrabajadorDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
@@ -65,25 +48,33 @@ import java.time.LocalDate
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FormularioMaterial(modifier: Modifier = Modifier ,
-    empresaViewModel: EmpresaViewModel ,
+fun FormularioEditarTrabajador(modifier: Modifier = Modifier ,
+    trabajadorViewModel: TrabajadorViewModel ,
     onback: () -> Unit ,
-    session: SessionManager ,
-    esEdicion: Boolean
+    session: SessionManager
 ){
     //variables del scnackba
     val snackbarEstado = remember { SnackbarHostState() }
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idMaterial = empresaViewModel.materialBuscado?.idMaterial ?: 0
-    val idEmpresa: Int = empresaViewModel.trabajadorBuscado?.idEmpresa  ?: session.getEmpresaId()
-    var titulo by remember { mutableStateOf(empresaViewModel.materialBuscado?.titulo ?: "") }
-    var stock by remember { mutableStateOf(empresaViewModel.materialBuscado?.stock ?: 1) }
+    val idTrabajador = trabajadorViewModel.trabajador?.idTrabajador ?: 0
+    val idEmpresa: Int = trabajadorViewModel.trabajador?.idEmpresa  ?: session.getEmpresaId()
+    var nombre by remember { mutableStateOf(trabajadorViewModel.trabajador?.nombre ?: "") }
+    var apellidos by remember { mutableStateOf(trabajadorViewModel.trabajador?.apellidos ?: "") }
+    var email by remember { mutableStateOf(trabajadorViewModel.trabajador?.email ?: "") }
+    var password by remember { mutableStateOf(trabajadorViewModel.trabajador?.password ?: "1234") }
+    var numeroTelefono by remember { mutableStateOf(trabajadorViewModel.trabajador?.numeroTelefono ?: "") }
+    var dni by remember { mutableStateOf(trabajadorViewModel.trabajador?.dni ?: "") }
+    var direccion by remember { mutableStateOf(trabajadorViewModel.trabajador?.dirreccion ?: "") }
+
+    val fechaActual = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    var fechaCreacion by remember { mutableStateOf(trabajadorViewModel.trabajador?.fechaCreacion ?: fechaActual) }
+
 
     LaunchedEffect(Unit) {
         //borramos el mensage para que no haya problema al salir sin guardar
-        empresaViewModel.limpiarErrorMensage()
+        trabajadorViewModel.limpiarErrorMensage()
     }
 
     //variable para mostrar dialogo de alerta
@@ -149,9 +140,9 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 OutlinedTextField(
-                    value = idMaterial.toString(),
+                    value = idTrabajador.toString(),
                     onValueChange = {  },
-                    label = { Text("Id Material") },
+                    label = { Text("Id Trabajador") },
                     enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -165,9 +156,9 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
 
                 OutlinedTextField(
-                    value = titulo,
-                    onValueChange = { titulo = it },
-                    label = { Text("Titulo") },
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
@@ -181,46 +172,123 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
 
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
+                OutlinedTextField(
+                    value = apellidos,
+                    onValueChange = { apellidos = it },
+                    label = { Text("Apellidos") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    // Botón Menos
-                    IconButton(
-                        onClick = { if (stock > 0) stock-- },
-                        modifier = Modifier.background(colorResource(id = R.color.personalizadoVerdoso), shape = RoundedCornerShape(8.dp))
-                    ) {
-                        Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Restar", tint = Color.White)
-                    }
-
-                    // Cuadro de texto para ver/editar número
-                    OutlinedTextField(
-                        value = stock.toString(),
-                        onValueChange = {
-                            // Solo permite números y actualiza el estado
-                            val newValue = it.filter { char -> char.isDigit() }
-                            stock = newValue.toIntOrNull() ?: 0
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .width(100.dp)
-                            .padding(horizontal = 8.dp),
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        label = { Text("Stock", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
                     )
+                )
 
-                    // Botón Más
-                    IconButton(
-                        onClick = { stock++ },
-                        modifier = Modifier.background(colorResource(id = R.color.personalizadoVerdoso), shape = RoundedCornerShape(8.dp))
-                    ) {
-                        Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Sumar", tint = Color.White)
-                    }
-                }
 
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Correo") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
+
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Contraseña") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
+
+
+                OutlinedTextField(
+                    value = numeroTelefono,
+                    onValueChange = { numeroTelefono = it },
+                    label = { Text("Número Telefono") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
+
+
+                OutlinedTextField(
+                    value = dni,
+                    onValueChange = { dni = it },
+                    label = { Text("Dni") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
+
+
+                OutlinedTextField(
+                    value = direccion,
+                    onValueChange = { direccion = it },
+                    label = { Text("Dirección") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = Color.Gray,
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
+
+
+
+                OutlinedTextField(
+                    value = fechaCreacion,
+                    onValueChange = { },
+                    label = { Text("Fecha Alta ") },
+                    readOnly = true ,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp) ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        unfocusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                    )
+                )
             }
 
 
@@ -230,9 +298,9 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    if(empresaViewModel.mensageError != null){
+                    if(trabajadorViewModel.mensageError != null){
                         lanzador.launch {
-                            snackbarEstado.showSnackbar(empresaViewModel.mensageError.toString())
+                            snackbarEstado.showSnackbar(trabajadorViewModel.mensageError.toString())
                         }
                         mostrarDialogoSalida = true
                     }else{
@@ -261,14 +329,10 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    empresaViewModel.limpiarErrorMensage()
-                    if(titulo != null && titulo != "" && stock != null && stock >= 0){
-                        val material = MaterialDTO(idMaterial, idEmpresa , titulo , stock)
-                        if(esEdicion){
-                            empresaViewModel.editarMaterial(material)
-                        }else{
-                            empresaViewModel.crearMaterial(material)
-                        }
+                    trabajadorViewModel.limpiarErrorMensage()
+                    if(nombre != null && nombre != "" && email != null && email != "" && password != null && password != ""){
+                        val trabajador = TrabajadorDTO(idTrabajador , idEmpresa , nombre , apellidos , email , password , numeroTelefono , dni , direccion , fechaCreacion)
+                        trabajadorViewModel.editarTrabajador(trabajador)
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el nombre , email o contraseña ")
@@ -285,7 +349,7 @@ fun FormularioMaterial(modifier: Modifier = Modifier ,
             }
 
 
-            empresaViewModel.mensageError?.let {
+            trabajadorViewModel.mensageError?.let {
                 lanzador.launch {
                     snackbarEstado.showSnackbar(it)
                 }

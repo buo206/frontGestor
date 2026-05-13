@@ -99,6 +99,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
 
     LaunchedEffect(Unit) {
+        empresaViewModel.limpiarErrorMensage()
         empresaViewModel.listarMateriales(session.getEmpresaId())
         empresaViewModel.listarTrabajadores(session.getEmpresaId())
     }
@@ -609,7 +610,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                         fechaHora+= minuto.toString()+":00"
                     }
 
-                    if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
+                    if(esEdicion && fechaHora.isNotEmpty() ){
                         val registroMaterial = RegistroMaterialDTO(
                             idRegistro,
                             idTrabajo,
@@ -622,7 +623,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             cantidad
                         )
                         empresaViewModel.editarRegistroMaterial(registroMaterial)
-                    }else if(!esEdicion && cantidad > 0   && fechaHora.isNotEmpty() && trabajadorSeleccionado != null && materialSeleccionado != null){
+                    }else if(!esEdicion && fechaHora.isNotEmpty() && trabajadorSeleccionado != null && materialSeleccionado != null){
                         val registroMaterial = RegistroMaterialDTO(
                             idRegistro,
                             idTrabajo,
@@ -637,7 +638,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                         empresaViewModel.crearRegistroMaterial(registroMaterial)
                     }else{
                         lanzador.launch {
-                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la cantidad (minimo 1) y la fecha(YYY-MM-DD)")
+                            snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la fecha(YYY-MM-DD)")
                         }
                     }
                 },
@@ -652,8 +653,9 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
 
             empresaViewModel.mensageError?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(it, color = Color.Red)
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
 
         }
