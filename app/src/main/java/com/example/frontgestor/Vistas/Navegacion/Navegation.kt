@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.frontgestor.Api.EmpresaViewModel
 import com.example.frontgestor.Api.LoginViewModel
+import com.example.frontgestor.Api.TrabajadorViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
 import com.example.frontgestor.Vistas.Empresa.FormularioMaterial
@@ -28,6 +29,9 @@ import com.example.frontgestor.Vistas.Empresa.ListaTrabajadores
 import com.example.frontgestor.Vistas.Empresa.ListaTrabajos
 import com.example.frontgestor.Vistas.Empresa.MenuMainE
 import com.example.frontgestor.Vistas.LoginScreen
+import com.example.frontgestor.Vistas.Trabajador.FormularioRegistroMaterialesTrabajo
+import com.example.frontgestor.Vistas.Trabajador.FormularioTrabajoTrabajador
+import com.example.frontgestor.Vistas.Trabajador.ListaTrabajosTrabajador
 import com.example.frontgestor.Vistas.Trabajador.MenuTrabajador
 
 
@@ -37,6 +41,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
     val navController = rememberNavController()
     val loginviewModel: LoginViewModel = viewModel()
     val empresaViewModel: EmpresaViewModel = viewModel()
+    val trabajadorViewModel: TrabajadorViewModel = viewModel()
     val rutaPrimera = if (sesion.isLogged()) {
             if(sesion.getTipo().equals("empresa")){
                AppDestination.MenuMainE.route
@@ -70,7 +75,7 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
         }
 
 
-        //empresa
+        //vistaempresa
 
         composable(route = AppDestination.MenuMainE.route) {
             MenuMainE(modifier ,
@@ -293,10 +298,65 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
             )
         }
 
-        //trabajador
+        //vista trabajador
 
         composable(route = AppDestination.MenuTrabajador.route){
-            MenuTrabajador(modifier)
+            MenuTrabajador(modifier ,
+                sesion ,
+                trabajadorViewModel ,
+                {
+                    navController.popBackStack()
+                    navController.navigate(AppDestination.Logueo.route)
+                } ,
+                {
+                    navController.navigate(AppDestination.ListaTrabajosTrabajador.route)
+                }
+            )
+        }
+
+        composable(route = AppDestination.ListaTrabajosTrabajador.route){
+            ListaTrabajosTrabajador(modifier ,
+                sesion ,
+                trabajadorViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                {
+                    navController.navigate(AppDestination.FormularioTrabajoTrabajador.route)
+                }
+            )
+        }
+
+
+        composable(route = AppDestination.FormularioTrabajoTrabajador.route){
+            FormularioTrabajoTrabajador(modifier ,
+                trabajadorViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                {
+                    navController.navigate(AppDestination.FormularioRegistroMaterialesTrabajo.route + "/true")
+                },{
+                    navController.navigate(AppDestination.FormularioRegistroMaterialesTrabajo.route + "/false")
+                }
+            )
+        }
+
+
+        composable(
+            route = AppDestination.FormularioRegistroMaterialesTrabajo.route + "/{esEdicion}",
+            arguments = listOf(
+                navArgument("esEdicion") { type = NavType.BoolType }
+            )
+        ){ backStackEntry ->
+            val esEdicion = backStackEntry.arguments?.getBoolean("esEdicion") ?: true
+            FormularioRegistroMaterialesTrabajo(modifier, trabajadorViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion ,
+                esEdicion
+            )
         }
     }
 }

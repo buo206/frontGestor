@@ -1,4 +1,4 @@
-package com.example.frontgestor.Vistas.Empresa
+package com.example.frontgestor.Vistas.Trabajador
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -60,20 +60,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.frontgestor.Api.EmpresaViewModel
+import com.example.frontgestor.Api.TrabajadorViewModel
 import com.example.frontgestor.Modelos.MaterialDTO
 import com.example.frontgestor.Modelos.RegistroMaterialDTO
 import com.example.frontgestor.Modelos.TrabajadorListaDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
+import com.example.frontgestor.Vistas.Empresa.aFechaString
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
-    empresaViewModel: EmpresaViewModel ,
+fun FormularioRegistroMaterialesTrabajo(modifier: Modifier = Modifier ,
+    trabajadorViewModel: TrabajadorViewModel ,
     onback: () -> Unit ,
     session: SessionManager ,
     esEdicion: Boolean
@@ -83,14 +87,18 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idRegistro = empresaViewModel.registroMaterialBuscado?.idRegistro ?: 0
-    val idMaterial = empresaViewModel.registroMaterialBuscado?.idMaterial ?: 0
-    val nombrematerial = empresaViewModel.registroMaterialBuscado?.tituloMaterial ?: "";
-    val idTrabajo = empresaViewModel.registroMaterialBuscado?.idTrabajo ?: empresaViewModel.trabajoBuscado?.idTrabajo
-    val idTrabajador = empresaViewModel.registroMaterialBuscado?.idTrabajador  ?: 0
-    val nombreTrabajador = empresaViewModel.registroMaterialBuscado?.nombreTrabajador ?:  ""
-    var cantidad by remember { mutableStateOf(empresaViewModel.registroMaterialBuscado?.cantidad ?: 1) }
-    var fechaHora = empresaViewModel.registroMaterialBuscado?.fecha ?: LocalDateTime.now().toString()
+    val idRegistro = trabajadorViewModel.registroMaterialBuscado?.idRegistro ?: 0
+    val idMaterial = trabajadorViewModel.registroMaterialBuscado?.idMaterial ?: 0
+    val nombrematerial = trabajadorViewModel.registroMaterialBuscado?.tituloMaterial ?: "";
+    val idTrabajo = trabajadorViewModel.registroMaterialBuscado?.idTrabajo ?: trabajadorViewModel.trabajoBuscado?.idTrabajo
+    var idTrabajador by remember { mutableStateOf(trabajadorViewModel.registroMaterialBuscado?.idTrabajador  ?: session.getUserId()) }
+    val nombreTrabajador = trabajadorViewModel.registroMaterialBuscado?.nombreTrabajador ?:  ""
+
+    //para luego cambiar la fecha y el trabajador de registro si se ha modificado la cantidad
+    val cantidadInicial = trabajadorViewModel.registroMaterialBuscado?.cantidad ?: 1
+    var cantidad by remember { mutableStateOf(cantidadInicial) }
+
+    var fechaHora = trabajadorViewModel.registroMaterialBuscado?.fecha ?: LocalDateTime.now().toString()
     var fecha  by remember { mutableStateOf(fechaHora.substring(0,10))}
     var hora by remember { mutableStateOf (fechaHora.substring(11,13).toInt() )}
     var minuto by remember { mutableStateOf(fechaHora.substring(14,16).toInt())}
@@ -99,8 +107,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
 
     LaunchedEffect(Unit) {
-        empresaViewModel.listarMateriales(session.getEmpresaId())
-        empresaViewModel.listarTrabajadores(session.getEmpresaId())
+        trabajadorViewModel.listarMateriales(session.getEmpresaId())
     }
 
     //variable para mostrar dialogo de alerta
@@ -110,30 +117,12 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
     var expandido by remember { mutableStateOf(false) }
     var materialSeleccionado by remember { mutableStateOf< MaterialDTO?>(null) }
 
-    val todosLosMateriales = empresaViewModel.materiales ?: emptyList()
-    val idsAsignados = empresaViewModel.registrosMateriales?.map { it.idMaterial } ?: emptyList()
+    val todosLosMateriales = trabajadorViewModel.materiales ?: emptyList()
+    val idsAsignados = trabajadorViewModel.registrosMateriales?.map { it.idMaterial } ?: emptyList()
 
     // Filtramos
     val materialesDisponibles = todosLosMateriales.filter { it.idMaterial !in idsAsignados }
 
-
-    //para trabajador
-    var expandidoTrabajadores by remember { mutableStateOf(false) }
-    var trabajadorSeleccionado by remember { mutableStateOf< TrabajadorListaDTO?>(null) }
-
-    val todosLosTrabajadores = empresaViewModel.trabajadores ?: emptyList()
-    val idsAsignadosT = empresaViewModel.registrosTrabajo?.map { it.idTrabajador } ?: emptyList()
-
-    // Filtramos
-    val trabajadoresDisponibles = todosLosTrabajadores.filter { it.idTrabajador in idsAsignadosT }
-
-
-    //variables para el selector de fechas
-    var mostrarPickerInicial by remember { mutableStateOf(false) }
-
-    val datePickerStateInicial = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis()
-    )
 
     Box(
         modifier = Modifier
@@ -226,39 +215,11 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
 
 
-                if(idTrabajador != 0 && idMaterial != 0){
-                    OutlinedTextField(
-                        value = idTrabajador.toString(),
-                        onValueChange = {  },
-                        label = { Text("ID Trabajador") },
-                        enabled = false,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)  ,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
-                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
-                        )
-                    )
-
-                    OutlinedTextField(
-                        value = nombreTrabajador,
-                        onValueChange = { },
-                        label = { Text("Nombre Trabajador") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)  ,
-                        enabled = false,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
-                            disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
-                        )
-                    )
-
+                if( idMaterial != 0){
                     OutlinedTextField(
                         value = idMaterial.toString(),
                         onValueChange = {  },
-                        label = { Text("ID Material") },
+                        label = { Text("ID Material" , color = colorResource(id = R.color.personalizadoVerdoso)) },
                         enabled = false,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -271,7 +232,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                     OutlinedTextField(
                         value = nombrematerial,
                         onValueChange = { },
-                        label = { Text("Nombre material") },
+                        label = { Text("Nombre material" , color = colorResource(id = R.color.personalizadoVerdoso)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)  ,
@@ -281,7 +242,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                         )
                     )
-                }else{
+                }else {
                     Text(
                         "Asignar nuevo Material",
                         modifier = Modifier.padding(8.dp),
@@ -296,13 +257,14 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             .padding(8.dp)
                     ) {
                         OutlinedTextField(
-                            value = materialSeleccionado?.let { "${it.titulo}" } ?: "Selecciona un material",
+                            value = materialSeleccionado?.let { "${it.titulo}" }
+                                ?: "Selecciona un material",
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text("Materiales disponible") },
+                            label = { Text("Materiales disponible" , color = colorResource(id = R.color.personalizadoVerdoso)) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
                             colors = OutlinedTextFieldDefaults.colors(
-                                disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                                disabledTextColor = colorResource(id = R.color.personalizadoVerdoso),
                                 disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                             ),
                             modifier = Modifier
@@ -334,61 +296,9 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             }
                         }
                     }
-
-
-                    Text(
-                        "Asignar trabajador",
-                        modifier = Modifier.padding(8.dp),
-                        color = Color.Green
-                    )
-
-                    ExposedDropdownMenuBox(
-                        expanded = expandidoTrabajadores,
-                        onExpandedChange = { expandidoTrabajadores = !expandidoTrabajadores },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                    ) {
-                        OutlinedTextField(
-                            value = trabajadorSeleccionado?.let { "${it.nombre}" } ?: "Selecciona un trabajador",
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text("Trabajador disponible") },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                                unfocusedBorderColor = Color.Gray,
-                            ),
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth()
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = expandidoTrabajadores,
-                            onDismissRequest = { expandidoTrabajadores = false },
-                            modifier = Modifier.background(Color.White)
-                        ) {
-                            if (trabajadoresDisponibles.isNullOrEmpty()) {
-                                DropdownMenuItem(
-                                    text = { Text("No hay trabajadores disponibles") },
-                                    onClick = { expandidoTrabajadores = false }
-                                )
-                            } else {
-                                trabajadoresDisponibles?.forEach { trabajador ->
-                                    DropdownMenuItem(
-                                        text = { Text("${trabajador.idTrabajador}.${trabajador.nombre} con email : ${trabajador.email} ") },
-                                        onClick = {
-                                            trabajadorSeleccionado = trabajador
-                                            expandidoTrabajadores = false
-                                        },
-                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
+
+
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -434,92 +344,32 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                     }
                 }
 
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
-                    OutlinedTextField(
-                        value = fecha,
-                        onValueChange = { },
-                        label = { Text("Fecha") },
-                        modifier = Modifier.fillMaxWidth(),
-                        readOnly = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = Color.Transparent
-                        )
+                OutlinedTextField(
+                    value = fecha,
+                    onValueChange = { },
+                    label = { Text("Fecha" , color = colorResource(id = R.color.personalizadoVerdoso)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
+                        cursorColor = Color.Transparent
                     )
-                    Box(modifier = Modifier
-                        .matchParentSize()
-                        .clickable { mostrarPickerInicial = true }
-                    )
-                }
+                )
 
-                if (mostrarPickerInicial) {
-                    DatePickerDialog(
-                        onDismissRequest = { mostrarPickerInicial = false },
-                        confirmButton = {
-                            Button(onClick = {
-                                val inicioMs = datePickerStateInicial.selectedDateMillis ?: 0L
-                                fecha = inicioMs.aFechaString()
-                                mostrarPickerInicial = false
-                            },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
 
-                            ) { Text("Aceptar") }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = { mostrarPickerInicial = false },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
-                            ) { Text("Cancelar") }
-                        },
-                        colors = DatePickerDefaults.colors(
-                            containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                            titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                            headlineContentColor = colorResource(id = R.color.personalizadoVerdoso)
-                        )
-                    ) {
-                        DatePicker(
-                            state = datePickerStateInicial,
-                            colors = DatePickerDefaults.colors(
-                                containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                                titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                                headlineContentColor = Color.White ,
-                                selectedDayContainerColor = Color.Green,
-                                selectedDayContentColor = Color.White,
-                                todayContentColor = Color.White,
-                                todayDateBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-
-                                )
-                        )
-                    }
-                }
 
                 Row{
                     OutlinedTextField(
                         value = hora.toString(),
                         onValueChange = {
-                            val newValue = it.filter { char -> char.isDigit() }
-                            hora = newValue.toIntOrNull() ?: 0
-                            if(hora > 24){
-                                hora = 24
-                            }else if(hora < 0){
-                                hora = 0
-                            }
                         },
+                        readOnly = true ,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .width(100.dp)
                             .padding(horizontal = 8.dp),
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        label = { Text("Hora", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
+                        label = { Text("Hora", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center , color = colorResource(id = R.color.personalizadoVerdoso)) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
                             unfocusedBorderColor = Color.Gray,
@@ -530,20 +380,14 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                     OutlinedTextField(
                         value = minuto.toString(),
                         onValueChange = {
-                            val newValue = it.filter { char -> char.isDigit() }
-                            minuto = newValue.toIntOrNull() ?: 0
-                            if(minuto > 59){
-                                minuto = 59
-                            }else if(minuto < 0){
-                                minuto = 0
-                            }
                         },
+                        readOnly = true ,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier
                             .width(100.dp)
                             .padding(horizontal = 8.dp),
                         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-                        label = { Text("Minutos", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) },
+                        label = { Text("Minutos", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center , color = colorResource(id = R.color.personalizadoVerdoso)) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
                             unfocusedBorderColor = Color.Gray,
@@ -562,9 +406,9 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    if(empresaViewModel.mensageError != null){
+                    if(trabajadorViewModel.mensageError != null){
                         lanzador.launch {
-                            snackbarEstado.showSnackbar(empresaViewModel.mensageError.toString())
+                            snackbarEstado.showSnackbar(trabajadorViewModel.mensageError.toString())
                         }
                         mostrarDialogoSalida = true
                     }else{
@@ -594,19 +438,11 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    empresaViewModel.limpiarErrorMensage()
+                    trabajadorViewModel.limpiarErrorMensage()
 
-                    var fechaHora = fecha +"T"
-                    if(hora <10){
-                        fechaHora += "0"+hora+":"
-                    }else{
-                        fechaHora += hora.toString() + ":"
-                    }
-
-                    if(minuto < 10 ){
-                        fechaHora += "0"+minuto+":00"
-                    }else{
-                        fechaHora+= minuto.toString()+":00"
+                    if(cantidad != cantidadInicial){
+                        fechaHora = LocalDateTime.now().toString().substring(0,19)
+                        idTrabajador = session.getUserId()
                     }
 
                     if(esEdicion &&  cantidad > 0   && fechaHora.isNotEmpty() ){
@@ -621,20 +457,20 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
                             fechaHora,
                             cantidad
                         )
-                        empresaViewModel.editarRegistroMaterial(registroMaterial)
-                    }else if(!esEdicion && cantidad > 0   && fechaHora.isNotEmpty() && trabajadorSeleccionado != null && materialSeleccionado != null){
+                        trabajadorViewModel.editarRegistroMaterial(registroMaterial)
+                    }else if(!esEdicion && cantidad > 0   && fechaHora.isNotEmpty()  && materialSeleccionado != null){
                         val registroMaterial = RegistroMaterialDTO(
                             idRegistro,
                             idTrabajo,
                             "",
                             materialSeleccionado?.idMaterial,
                             "",
-                            trabajadorSeleccionado?.idTrabajador,
+                            idTrabajador,
                             "",
                             fechaHora,
                             cantidad
                         )
-                        empresaViewModel.crearRegistroMaterial(registroMaterial)
+                        trabajadorViewModel.crearRegistroMaterial(registroMaterial)
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente la cantidad (minimo 1) y la fecha(YYY-MM-DD)")
@@ -651,7 +487,7 @@ fun FormularioRegistroMateriales(modifier: Modifier = Modifier ,
             }
 
 
-            empresaViewModel.mensageError?.let {
+            trabajadorViewModel.mensageError?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(it, color = Color.Red)
             }

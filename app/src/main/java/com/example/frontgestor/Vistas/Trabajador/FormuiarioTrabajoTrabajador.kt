@@ -1,4 +1,4 @@
-package com.example.frontgestor.Vistas.Empresa
+package com.example.frontgestor.Vistas.Trabajador
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -63,6 +63,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import java.time.format.DateTimeFormatter
 import com.example.frontgestor.Api.EmpresaViewModel
+import com.example.frontgestor.Api.TrabajadorViewModel
 import com.example.frontgestor.Modelos.TrabajoDTO
 import com.example.frontgestor.R
 import com.example.frontgestor.SessionManager
@@ -71,17 +72,14 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import kotlin.time.ExperimentalTime
 import java.time.Instant
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun FormularioTrabajo(modifier: Modifier = Modifier ,
-    empresaViewModel: EmpresaViewModel ,
+fun FormularioTrabajoTrabajador(modifier: Modifier = Modifier ,
+    trabajadorViewModel: TrabajadorViewModel ,
     onback: () -> Unit ,
-    session: SessionManager ,
-    esEdicion: Boolean ,
-    onEditarRegistroTrabajador : () -> Unit,
-    onCrearRegistroTrabajador: () -> Unit ,
     onEditarRegistroMateriales: () -> Unit,
     onCrearRegistroMateriales: () -> Unit
 ){
@@ -90,49 +88,35 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     val lanzador = rememberCoroutineScope()
 
     // Campos de TrabajadorDTO
-    val idTrabajo = empresaViewModel.trabajoBuscado?.idTrabajo ?: 0
-    val idEmpresa: Int = empresaViewModel.trabajoBuscado?.idEmpresa  ?: session.getEmpresaId()
-    var titulo by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.titulo ?: "") }
-    var descripcion by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.descripcion ?: "") }
-    var anotacion by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.anotacion ?: "") }
-    var estado by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.estado ?: "Espera") }
+    val idTrabajo = trabajadorViewModel.trabajoBuscado?.idTrabajo ?: 0
+    val idEmpresa: Int = trabajadorViewModel.trabajoBuscado?.idEmpresa  ?: 0
+    var titulo by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.titulo ?: "") }
+    var descripcion by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.descripcion ?: "") }
+    var anotacion by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.anotacion ?: "") }
+    var estado by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.estado ?: "Espera") }
     if(estado.uppercase().equals( "P")){
         estado = "Proceso"
-    }else if(estado.uppercase().equals("F")){
-        estado = "Finalizado"
     }else if(estado.uppercase().equals("E")){
         estado = "Espera"
     }else if(estado.uppercase().equals("R")){
         estado = "Revisión"
     }
-    var fechaFinal by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.fechaFinal ?: "") }
+    var fechaFinal by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.fechaFinal ?: "") }
 
-    val fechaActual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-    var fechaInicial by remember { mutableStateOf(empresaViewModel.trabajoBuscado?.fechaInicio ?: fechaActual) }
-
-
-    //variables para el selector de fechas
-    var mostrarPickerInicial by remember { mutableStateOf(false) }
-    var mostrarPickerFinal by remember { mutableStateOf(false) }
-
-    val datePickerStateInicial = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis()
-    )
-    val datePickerStateFinal = rememberDatePickerState()
+    var fechaInicial by remember { mutableStateOf(trabajadorViewModel.trabajoBuscado?.fechaInicio ?: "") }
 
     //borramos el mensage para que no haya problema al salir sin guardar
-    empresaViewModel.limpiarErrorMensage()
+    trabajadorViewModel.limpiarErrorMensage()
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
 
     //variable para dropdowbn de estado
     var expandido by remember { mutableStateOf(false) }
-    val estados = listOf("Espera", "Proceso", "Finalizado", "Revisión")
+    val estados = listOf("Espera", "Proceso", "Revisión")
 
     LaunchedEffect(Unit){
-        empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
-        empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+        trabajadorViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
     }
 
 
@@ -199,7 +183,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = idTrabajo.toString(),
                     onValueChange = {  },
-                    label = { Text("Id Trabajo") },
+                    label = { Text("Id Trabajo" , color = colorResource(id = R.color.personalizadoVerdoso)) },
                     enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -215,15 +199,14 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                 OutlinedTextField(
                     value = titulo,
                     onValueChange = { titulo= it },
-                    label = { Text("Titulo") },
+                    label = { Text("Titulo" , color = colorResource(id = R.color.personalizadoVerdoso) ) },
+                    enabled = false,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)  ,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                        unfocusedBorderColor = Color.Gray,
-                        focusedLabelColor = colorResource(id = R.color.personalizadoVerdoso),
-                        cursorColor = colorResource(id = R.color.personalizadoVerdoso)
+                        disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                        disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                     )
                 )
 
@@ -278,6 +261,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                                 text = { Text(estadox) },
                                 onClick = {
                                     estado = estadox
+                                    if(estadox.equals("Revisión")){
+                                        fechaFinal = LocalDate.now().toString()
+                                    }
                                     expandido = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -286,159 +272,33 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     }
                 }
 
-
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
-                    OutlinedTextField(
-                        value = fechaInicial,
-                        onValueChange = { },
-                        label = { Text("Fecha inicial") },
-                        modifier = Modifier.fillMaxWidth(),
-                        readOnly = true, // No permite escribir a mano
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = Color.Transparent
-                        )
+                OutlinedTextField(
+                    value = fechaInicial,
+                    onValueChange = { },
+                    label = { Text("Fecha inicial" ,color = colorResource(id = R.color.personalizadoVerdoso)) },
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                        disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                     )
-                    Box(modifier = Modifier
-                        .matchParentSize()
-                        .clickable { mostrarPickerInicial = true }
+                )
+
+                OutlinedTextField(
+                    value = fechaFinal,
+                    onValueChange = { },
+                    label = { Text("Fecha final" , color = colorResource(id = R.color.personalizadoVerdoso) ) },
+                    enabled = false,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)  ,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = colorResource(id = R.color.personalizadoVerdoso) ,
+                        disabledBorderColor = colorResource(id = R.color.personalizadoVerdoso)
                     )
-                }
-
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
-                    OutlinedTextField(
-                        value = fechaFinal,
-                        onValueChange = { },
-                        label = { Text("Fecha final") },
-                        modifier = Modifier.fillMaxWidth(),
-                        readOnly = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            cursorColor = Color.Transparent
-                        )
-                    )
-                    Box(modifier = Modifier
-                        .matchParentSize()
-                        .clickable { mostrarPickerFinal = true }
-                    )
-                }
-
-                if (mostrarPickerInicial) {
-                    DatePickerDialog(
-                        onDismissRequest = { mostrarPickerInicial = false },
-                        confirmButton = {
-                            Button(onClick = {
-                                val inicioMs = datePickerStateInicial.selectedDateMillis ?: 0L
-                                val finMs = datePickerStateFinal.selectedDateMillis
-
-
-                                if (finMs != null && inicioMs > finMs) {
-                                    lanzador.launch {
-                                        snackbarEstado.showSnackbar("La fecha inicial no puede ser posterior a la final")
-                                    }
-                                } else {
-                                    fechaInicial = inicioMs.aFechaString()
-                                    mostrarPickerInicial = false
-                                }
-                            },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
-
-                            ) { Text("Aceptar") }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = { mostrarPickerInicial = false },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
-                            ) { Text("Cancelar") }
-                        },
-                        colors = DatePickerDefaults.colors(
-                            containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                            titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                            headlineContentColor = colorResource(id = R.color.personalizadoVerdoso)
-                        )
-                    ) {
-                        DatePicker(
-                            state = datePickerStateInicial,
-                            colors = DatePickerDefaults.colors(
-                                containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                                titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                                headlineContentColor = Color.White ,
-                                selectedDayContainerColor = Color.Green,
-                                selectedDayContentColor = Color.White,
-                                todayContentColor = Color.White,
-                                todayDateBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-
-                            )
-                        )
-                    }
-                }
-
-                if (mostrarPickerFinal) {
-                    DatePickerDialog(
-                        onDismissRequest = { mostrarPickerFinal = false },
-                        confirmButton = {
-                            Button(onClick = {
-                                val inicioMs = datePickerStateInicial.selectedDateMillis ?: 0L
-                                val finMs = datePickerStateFinal.selectedDateMillis ?: 0L
-
-                                if (finMs >= inicioMs) {
-                                    fechaFinal = finMs.aFechaString()
-                                    mostrarPickerFinal = false
-                                } else {
-                                    lanzador.launch {
-                                        snackbarEstado.showSnackbar("La fecha final debe ser posterior a la inicial")
-                                    }
-                                }
-                            },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
-                            ) { Text("Aceptar") }
-                        },
-                        dismissButton = {
-                            Button(
-                                onClick = {mostrarPickerFinal = false} ,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Green,
-                                    contentColor = Color.White
-                                )
-                            ){
-                                Text("Cerrar")
-                            }
-                        },
-                        colors = DatePickerDefaults.colors(
-                            containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                            titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                            headlineContentColor = colorResource(id = R.color.personalizadoVerdoso)
-                        )
-                    ) {
-                        DatePicker(
-                            state = datePickerStateFinal,
-                            colors = DatePickerDefaults.colors(
-                                containerColor = colorResource(id = R.color.personalizadoVerdoso),
-                                titleContentColor = colorResource(id = R.color.personalizadoVerdoso),
-                                headlineContentColor = Color.White ,
-                                selectedDayContainerColor = Color.Green,
-                                selectedDayContentColor = Color.White,
-                                todayContentColor = Color.White,
-                                todayDateBorderColor = colorResource(id = R.color.personalizadoVerdoso),
-                            )
-                        )
-                    }
-                }
-
+                )
 
                 OutlinedTextField(
                     value = anotacion,
@@ -455,95 +315,12 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     )
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = {
-                        empresaViewModel.limpiarRegistroTrabajoBuscado()
-                        onCrearRegistroTrabajador()
-                    }){
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add",
-                            modifier = Modifier.size(24.dp),
-                            tint = colorResource(R.color.personalizadoVerdoso)
-                        )
-                    }
-                    Text(
-                        text = "Lista de Trabajadores",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(4.dp),
-                        color = colorResource(R.color.personalizadoVerdoso)
-                    )
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                empresaViewModel.registrosTrabajo?.forEach{ registroTrabajo ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        shape = RoundedCornerShape(20.dp),
-                        elevation = CardDefaults.cardElevation(4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = colorResource(R.color.personalizadoVerdoso),
-                            contentColor = Color.White
-                        ) ,
-                        onClick = {
-                            empresaViewModel.setRegistroTrabajo(registroTrabajo)
-                            empresaViewModel.buscarRegistroTrabajo(idTrabajo , registroTrabajo.idTrabajador)
-                            onEditarRegistroTrabajador()
-                        }
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row {
 
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = "Nombre",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "Nombre : ${registroTrabajo.nombreTrabajador  ?: "No disponible"}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(4.dp)
-                                )
-                            }
-
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Filled.Face,
-                                    contentDescription = "Apellidos",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "Apellidos : ${registroTrabajo.apellidosTrabajador  ?: "No disponible"}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(4.dp)
-                                )
-                            }
-
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Filled.AccountCircle,
-                                    contentDescription = "Rol",
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Text(
-                                    text = "Rol : ${registroTrabajo.rol ?: "No disponible"}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(4.dp)
-                                )
-                            }
-
-                        }
-                    }
-
-                }
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = {
-                        empresaViewModel.limpiarRegistroMaterialBuscado()
+                        trabajadorViewModel.limpiarRegistroMaterialBuscado()
                         onCrearRegistroMateriales()
                     }){
                         Icon(
@@ -561,7 +338,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
-                empresaViewModel.registrosMateriales?.forEach { registroMaterial ->
+                trabajadorViewModel.registrosMateriales?.forEach { registroMaterial ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -573,8 +350,8 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                             contentColor = Color.White
                         ) ,
                         onClick = {
-                            empresaViewModel.setRegistroMaterial(registroMaterial)
-                            empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador ?: 0 , registroMaterial.idTrabajo ?: 0 , registroMaterial.idMaterial ?: 0)
+                            trabajadorViewModel.setRegistroMaterial(registroMaterial)
+                            trabajadorViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador ?: 0 , registroMaterial.idTrabajo ?: 0 , registroMaterial.idMaterial ?: 0)
                             onEditarRegistroMateriales()
                         }
                     ) {
@@ -659,9 +436,9 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    if(empresaViewModel.mensageError != null){
+                    if(trabajadorViewModel.mensageError != null){
                         lanzador.launch {
-                            snackbarEstado.showSnackbar(empresaViewModel.mensageError.toString())
+                            snackbarEstado.showSnackbar(trabajadorViewModel.mensageError.toString())
                         }
                         mostrarDialogoSalida = true
                     }else{
@@ -690,24 +467,18 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
             Button(
                 onClick = {
-                    empresaViewModel.limpiarErrorMensage();
+                    trabajadorViewModel.limpiarErrorMensage();
                     var estadoFinal = "Proceso"
                     if(estado.equals( "Proceso")){
                         estadoFinal = "P"
-                    }else if(estado.equals("Finalizado")){
-                        estadoFinal = "F"
                     }else if(estado.equals("Espera")){
                         estadoFinal = "E"
                     }else if(estado.equals("Revisión")){
                         estadoFinal = "R"
                     }
-                    if(titulo.isNotEmpty() && descripcion.isNotEmpty() && fechaInicial.isNotEmpty()  && estado.isNotEmpty()){
+                    if(titulo.isNotEmpty() && descripcion.isNotEmpty()   && estado.isNotEmpty()){
                         val trabajo = TrabajoDTO(idTrabajo , idEmpresa , titulo , descripcion ,  fechaInicial , fechaFinal ,anotacion , estadoFinal )
-                        if(esEdicion){
-                            empresaViewModel.editarTrabajo(trabajo)
-                        }else{
-                            empresaViewModel.crearTrabajo(trabajo)
-                        }
+                        trabajadorViewModel.editarTrabajo(trabajo)
                     }else{
                         lanzador.launch {
                             snackbarEstado.showSnackbar("Error al introducir los cambios reviselos , expecificamente el titulo , descripcion o fecha inicio ")
@@ -724,7 +495,7 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
             }
 
 
-            empresaViewModel.mensageError?.let {
+            trabajadorViewModel.mensageError?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(it, color = Color.Red)
             }

@@ -33,6 +33,9 @@ interface ApiService {
     @GET("trabajo/listar/{idEmpresa}")
     suspend fun listarTrabajos(@Path("idEmpresa") id: Int): Response<List<TrabajoListaDTO>>
 
+    @GET("trabajo/listarTrabajador/{idTrabjador}")
+    suspend fun listarTrabajosPorTrabjador(@Path("idTrabjador") id: Int): Response<List<TrabajoListaDTO>>
+
     @GET("material/listar/{idEmpresa}")
     suspend fun listarMateriales(@Path("idEmpresa") id: Int): Response<List<MaterialDTO>>
 

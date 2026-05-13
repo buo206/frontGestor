@@ -156,16 +156,16 @@ fun LoginScreen( modifier: Modifier = Modifier ,
                 onClick = {
                     viewModel.login(email, password, isEmpresa) {
 
-                        if(viewModel.empresa != null){
-                            if (isEmpresa) {
-                                val idEmpresa = viewModel.empresa?.idEmpresa ?: 0
-                                session.saveUser(idEmpresa , 0, "empresa")
-                            } else {
-                                val idTrabajador = viewModel.trabajador?.idTrabajador ?: 0
-                                val idEmpresa = viewModel.trabajador?.idEmpresa ?: 0
-                                session.saveUser(idEmpresa , idTrabajador, "trabajador")
-                            }
+                        if (isEmpresa && viewModel.empresa != null) {
+                            val idEmpresa = viewModel.empresa?.idEmpresa ?: 0
+                            session.saveUser(idEmpresa , 0, "empresa")
+                        } else if(viewModel.trabajador != null){
+                            val idTrabajador = viewModel.trabajador?.idTrabajador ?: 0
+                            val idEmpresa = viewModel.trabajador?.idEmpresa ?: 0
+                            session.saveUser(idEmpresa , idTrabajador, "trabajador")
+                        }
 
+                        if(viewModel.empresa != null || viewModel.trabajador != null ){
                             onLoginSuccess()
                             onNavigateToMenu()
                         }
