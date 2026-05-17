@@ -7,6 +7,7 @@ sealed class AppDestination(val route: String) {
     //vista empresa
     data object MenuMainE : AppDestination("menumaine")
 
+    data object FormularioEmpresa : AppDestination("formularioempresa")
     data object ListaTrabajadores : AppDestination("listatrabajadores")
 
     data object DetalleTrabajador : AppDestination("detalletrabajador")

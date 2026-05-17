@@ -53,6 +53,7 @@ import com.example.frontgestor.SessionManager
 @Composable
 fun MenuMainE(modifier: Modifier = Modifier,
     onNavegationToLista: () -> Unit ,
+    onEditar: () -> Unit ,
     sesion : SessionManager ,
     empresaViewModel : EmpresaViewModel ,
     onBack : () -> Unit ,
@@ -163,7 +164,11 @@ fun MenuMainE(modifier: Modifier = Modifier,
 
 
                 Button(
-                    onClick = { /* editar perfil */ },
+                    onClick = {
+                        if(empresaViewModel.empresa != null){
+                            onEditar()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth() ,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.personalizadoVerdoso),

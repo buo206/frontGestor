@@ -17,6 +17,7 @@ import com.example.frontgestor.Api.LoginViewModel
 import com.example.frontgestor.Api.TrabajadorViewModel
 import com.example.frontgestor.SessionManager
 import com.example.frontgestor.Vistas.Empresa.DetalleTrabajador
+import com.example.frontgestor.Vistas.Empresa.FormularioEmpresa
 import com.example.frontgestor.Vistas.Empresa.FormularioMaterial
 import com.example.frontgestor.Vistas.Empresa.FormularioRegistroMateriales
 import com.example.frontgestor.Vistas.Empresa.FormularioRegistroTrabajo
@@ -82,7 +83,9 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
             MenuMainE(modifier ,
                 {
                     navController.navigate(AppDestination.ListaTrabajadores.route)
-                } ,
+                } ,{
+                    navController.navigate(AppDestination.FormularioEmpresa.route)
+                },
                 sesion ,
                 empresaViewModel ,
                 {
@@ -95,6 +98,17 @@ fun Navegation(modifier : Modifier = Modifier , sesion : SessionManager){
                 {
                     navController.navigate(AppDestination.ListaTrabajos.route)
                 }
+            )
+        }
+
+        composable(
+            route = AppDestination.FormularioEmpresa.route,
+        ){ backStackEntry ->
+            FormularioEmpresa(modifier, empresaViewModel ,
+                {
+                    navController.popBackStack()
+                } ,
+                sesion ,
             )
         }
 

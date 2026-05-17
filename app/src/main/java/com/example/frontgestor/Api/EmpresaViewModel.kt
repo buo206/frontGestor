@@ -498,6 +498,28 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun editarEmpresa(empresaDTO: EmpresaDTO) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.editarEmpresa(empresaDTO)
+                if (result.isSuccessful) {
+                    empresa = result.body()
+                } else {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
     fun crearTrabajador(trabajdor: TrabajadorDTO) {
         viewModelScope.launch {
             cargando = true
@@ -609,7 +631,9 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+
     //borrar
+
     fun eliminarTrabajo(idTrabajo: Int) {
         viewModelScope.launch {
             cargando = true

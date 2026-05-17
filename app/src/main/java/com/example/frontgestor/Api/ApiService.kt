@@ -99,11 +99,14 @@ interface ApiService {
     @POST("trabajo/editar")
     suspend fun editarTrabajo(@Body trabajo: TrabajoDTO): Response<TrabajoDTO>
 
+    @POST("empresa/editar")
+    suspend fun editarEmpresa(@Body empresa: EmpresaDTO): Response<EmpresaDTO>
 
     @POST("trabajo/alta")
     suspend fun crearTrabajo(@Body trabajo: TrabajoDTO): Response<TrabajoDTO>
 
     //eliminar
+
     @POST("trabajo/eliminar/{idTrabajo}")
     suspend fun eliminarTrabajo(@Path("idTrabajo"  ) idTrabajo: Int): Response<Boolean>
 
