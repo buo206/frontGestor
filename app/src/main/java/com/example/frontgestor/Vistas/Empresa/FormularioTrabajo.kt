@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -124,6 +125,12 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
 
     //variable para mostrar dialogo de alerta
     var mostrarDialogoSalida by remember { mutableStateOf(false) }
+    var mostrarDialogoSalida2 by remember { mutableStateOf(false) }
+    var mostrarDialogoSalida3 by remember { mutableStateOf(false) }
+
+    //variable para saber el trabajador o material que hay que borrar
+    var idTrabajador by remember { mutableStateOf(0) }
+    var idRegistroMaterial by remember { mutableStateOf(0) }
 
     //variable para dropdowbn de estado
     var expandido by remember { mutableStateOf(false) }
@@ -132,8 +139,11 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
     LaunchedEffect(Unit){
         //borramos el mensage para que no haya problema al salir sin guardar
         empresaViewModel.limpiarErrorMensage()
-        empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
-        empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+        if(idTrabajo != 0){
+            empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
+            empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+        }
+
     }
 
 
@@ -181,6 +191,70 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                         ) {
                             Text(
                                 "Permanecer y arreglar",
+                                color = colorResource(id = R.color.personalizadoVerdoso)
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            if (mostrarDialogoSalida2) {
+                AlertDialog(
+                    onDismissRequest = { mostrarDialogoSalida2 = false },
+                    title = { Text(text = "Borrar registro trabajador") },
+                    text = { Text(text = "¿Estas seguro que quieres borrarlo ?") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida2 = false
+                            }
+                        ) {
+                            Text("Cancelar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida2 = false
+                                empresaViewModel.eliminarRegistroTrabajo(idTrabajo , idTrabajador)
+                                empresaViewModel.listarRegistrosTrabajo(idTrabajo)
+                            }
+                        ) {
+                            Text(
+                                "Confirmar",
+                                color = colorResource(id = R.color.personalizadoVerdoso)
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            if (mostrarDialogoSalida3) {
+                AlertDialog(
+                    onDismissRequest = { mostrarDialogoSalida3 = false },
+                    title = { Text(text = "Borrar registro material") },
+                    text = { Text(text = "¿Estas seguro que quieres borrarlo ?Si borras la tarea la se le sumara al stock de este material la cantidad usada ") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida3 = false
+                            }
+                        ) {
+                            Text("Cancelar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida3 = false
+                                empresaViewModel.eliminarRegistroMaterial(idRegistroMaterial , idTrabajo)
+                                empresaViewModel.buscarRegistroMaterialPorTrabajo(idTrabajo)
+                            }
+                        ) {
+                            Text(
+                                "Confirmar",
                                 color = colorResource(id = R.color.personalizadoVerdoso)
                             )
                         }
@@ -482,18 +556,25 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(12.dp)
+                            .combinedClickable(
+                                onClick = {
+                                    empresaViewModel.setRegistroTrabajo(registroTrabajo)
+                                    empresaViewModel.buscarRegistroTrabajo(idTrabajo , registroTrabajo.idTrabajador)
+                                    onEditarRegistroTrabajador()
+                                },
+                                onLongClick = {
+                                    idTrabajador = registroTrabajo.idTrabajador ?: 0
+                                    mostrarDialogoSalida2 = true
+                                }
+                            ),
                         shape = RoundedCornerShape(20.dp),
                         elevation = CardDefaults.cardElevation(4.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = colorResource(R.color.personalizadoVerdoso),
                             contentColor = Color.White
                         ) ,
-                        onClick = {
-                            empresaViewModel.setRegistroTrabajo(registroTrabajo)
-                            empresaViewModel.buscarRegistroTrabajo(idTrabajo , registroTrabajo.idTrabajador)
-                            onEditarRegistroTrabajador()
-                        }
+
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row {
@@ -566,18 +647,24 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(12.dp)
+                            .combinedClickable(
+                                onClick = {
+                                    empresaViewModel.setRegistroMaterial(registroMaterial)
+                                    empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador ?: 0 , registroMaterial.idTrabajo ?: 0 , registroMaterial.idMaterial ?: 0)
+                                    onEditarRegistroMateriales()
+                                },
+                                onLongClick = {
+                                    idRegistroMaterial = registroMaterial.idRegistro
+                                    mostrarDialogoSalida3 = true
+                                }
+                            ),
                         shape = RoundedCornerShape(20.dp),
                         elevation = CardDefaults.cardElevation(4.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = colorResource(R.color.personalizadoVerdoso),
                             contentColor = Color.White
-                        ) ,
-                        onClick = {
-                            empresaViewModel.setRegistroMaterial(registroMaterial)
-                            empresaViewModel.buscarRegistroMaterialPorTodo(registroMaterial.idTrabajador ?: 0 , registroMaterial.idTrabajo ?: 0 , registroMaterial.idMaterial ?: 0)
-                            onEditarRegistroMateriales()
-                        }
+                        )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row {

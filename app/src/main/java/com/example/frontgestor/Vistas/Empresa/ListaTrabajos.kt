@@ -1,6 +1,7 @@
 package com.example.frontgestor.Vistas.Empresa
 
 import androidx.activity.result.launch
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -42,6 +44,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -89,6 +92,12 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
         it.titulo?.contains(textoBusqueda, ignoreCase = true) == true
     }
 
+    //variable para mostrar dialogo de alerta
+    var mostrarDialogoSalida by remember { mutableStateOf(false) }
+
+    //variable para saber el trabajo que hay que borrar
+    var idTrabajo by remember { mutableStateOf(0) }
+
     LaunchedEffect(Unit){
         empresaViewModel.listarTrabajos(sesion.getEmpresaId())
     }
@@ -132,6 +141,7 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                         )
                     }
                     IconButton(onClick = {
+                        empresaViewModel.limpiarErrorMensage()
                         empresaViewModel.limpiarTrabajoBuscado()
                         onCrearNuevo()
                     }) {
@@ -200,7 +210,38 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                     unfocusedBorderColor = Color.Gray
                 )
             )
-
+            if (mostrarDialogoSalida) {
+                AlertDialog(
+                    onDismissRequest = { mostrarDialogoSalida = false },
+                    title = { Text(text = "Borrar tarea") },
+                    text = { Text(text = "¿Estas seguro que quieres borrarlo ?Si borras la tarea se borra los registros de trabajadors y materiales") },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida = false
+                                empresaViewModel.listarTrabajos(sesion.getEmpresaId())
+                            }
+                        ) {
+                            Text("Cancelar", color = Color.Red)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                mostrarDialogoSalida = false
+                                empresaViewModel.eliminarTrabajo(idTrabajo)
+                                empresaViewModel.listarTrabajos(sesion.getEmpresaId())
+                            }
+                        ) {
+                            Text(
+                                "Confirmar",
+                                color = colorResource(id = R.color.personalizadoVerdoso)
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             if(empresaViewModel.trabajos == null){
                 Box(
@@ -223,18 +264,24 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(12.dp)
+                                .combinedClickable(
+                                    onClick = {
+                                        empresaViewModel.buscarTrabajo(trabajo.idTrabajo)
+                                        empresaViewModel.limpiarListaMateriales()
+                                        onDetalle()
+                                    },
+                                    onLongClick = {
+                                        idTrabajo = trabajo.idTrabajo
+                                        mostrarDialogoSalida = true
+                                    }
+                                ),
                             shape = RoundedCornerShape(20.dp),
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = colorResource(R.color.personalizadoVerdoso),
                                 contentColor = Color.White
-                            ) ,
-                            onClick = {
-                                empresaViewModel.buscarTrabajo(trabajo.idTrabajo)
-                                empresaViewModel.limpiarListaMateriales()
-                                onDetalle()
-                            }
+                            )
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 Row {
@@ -291,6 +338,12 @@ fun ListaTrabajos(modifier: Modifier = Modifier ,
                     }
                 }
 
+            }
+
+            empresaViewModel.mensageError?.let {
+                lanzador.launch {
+                    snackbarEstado.showSnackbar(it)
+                }
             }
         }
 

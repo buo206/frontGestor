@@ -103,10 +103,20 @@ interface ApiService {
     @POST("trabajo/alta")
     suspend fun crearTrabajo(@Body trabajo: TrabajoDTO): Response<TrabajoDTO>
 
+    //eliminar
+    @POST("trabajo/eliminar/{idTrabajo}")
+    suspend fun eliminarTrabajo(@Path("idTrabajo"  ) idTrabajo: Int): Response<Boolean>
+
+    @POST("registroTrabajo/eliminar/{idTrabajo}/{idTrabajador}")
+    suspend fun eliminarRegistroTrabajo(@Path("idTrabajo"  ) idTrabajo: Int , @Path("idTrabajador"  ) idTrabajador: Int): Response<Boolean>
+
+    @POST("registroMaterial/eliminar/{idRegistro}")
+    suspend fun eliminarRegistroMaterial(@Path("idRegistro"  ) idRegistro: Int  ): Response<Boolean>
+
     companion object {
         private var apiService: ApiService? = null
 
-        private const val BASE_URL = "http://192.168.0.27:8096/res/"
+        private const val BASE_URL = "http://192.168.0.78:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {

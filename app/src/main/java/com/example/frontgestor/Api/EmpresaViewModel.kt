@@ -608,6 +608,71 @@ class EmpresaViewModel : ViewModel() {
             cargando = false
         }
     }
+
+    //borrar
+    fun eliminarTrabajo(idTrabajo: Int) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.eliminarTrabajo(idTrabajo)
+                if (!result.isSuccessful) {
+                    mensageError = obtenerMensajeError(result)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+    fun eliminarRegistroMaterial(idRegistro: Int , idTrabajo: Int) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.eliminarRegistroMaterial(idRegistro)
+                if (!result.isSuccessful) {
+                    mensageError = obtenerMensajeError(result)
+                }else{
+                    buscarRegistroMaterialPorTrabajo(idTrabajo)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+    fun eliminarRegistroTrabajo(idTrabajo: Int , idTrabajador: Int) {
+        viewModelScope.launch {
+            cargando = true
+            mensageError = null
+            try {
+                var result = api.eliminarRegistroTrabajo(idTrabajo , idTrabajador)
+                if (!result.isSuccessful) {
+                    mensageError = obtenerMensajeError(result)
+                }else{
+                    listarRegistrosTrabajo(idTrabajo)
+                }
+            } catch (e: IOException) {
+                mensageError = "No hay conexión con el servidor. Revisa tu internet o inténtalo más tarde."
+            } catch (e: HttpException) {
+                mensageError = "Error de conexión con el servidor."
+            } catch (e: Exception) {
+                mensageError = "Ha ocurrido un error inesperado."
+            }
+            cargando = false
+        }
+    }
+
+
 }
 
 private fun obtenerMensajeError(response: Response<*>): String {
