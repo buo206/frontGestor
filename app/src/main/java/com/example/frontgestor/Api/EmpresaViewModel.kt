@@ -248,6 +248,12 @@ class EmpresaViewModel : ViewModel() {
         }
     }
 
+    fun limpiarRegistroTrabajo(){
+        if(cargando == false ){
+            registrosTrabajo = null
+        }
+    }
+
     fun limpiarListaMateriales(){
         if(cargando == false){
             registrosMateriales = null

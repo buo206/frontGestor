@@ -753,6 +753,8 @@ fun FormularioTrabajo(modifier: Modifier = Modifier ,
                         }
                         mostrarDialogoSalida = true
                     }else{
+                        empresaViewModel.limpiarListaMateriales()
+                        empresaViewModel.limpiarRegistroTrabajo()
                         onback()
                     }
                 },
