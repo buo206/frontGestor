@@ -78,7 +78,7 @@ fun ListaRegistroTrabajador(modifier: Modifier = Modifier ,
 
     //variable para el buscador
     var textoBusqueda by remember { mutableStateOf("") }
-    val registrosTrabajadorFiltrado = empresaViewModel.registrosTrabajador?.filter {
+    var registrosTrabajadorFiltrado = empresaViewModel.registrosTrabajador?.filter {
         it.tituloTrabajo?.contains(textoBusqueda, ignoreCase = true) == true
     }
 
@@ -110,6 +110,7 @@ fun ListaRegistroTrabajador(modifier: Modifier = Modifier ,
 
         Button(
             onClick = {
+                empresaViewModel.limpiarRegistroTrabajador()
                 onBack()
             },
             modifier = Modifier.fillMaxWidth().padding(12.dp) ,

@@ -156,7 +156,7 @@ class EmpresaViewModel : ViewModel() {
             cargando = true
             mensageError = null
             try {
-                var result = api.buscarRegistroTrabajador(idTrabajo, idTrabajador)
+                var result = api.buscarRegistroTrabajo(idTrabajo, idTrabajador)
                 if (result.isSuccessful) {
                     registroTrabajobuscado = result.body()
                 } else {
@@ -240,6 +240,11 @@ class EmpresaViewModel : ViewModel() {
     fun limpirarMaterial(){
         if(cargando == false){
             materialBuscado = null
+        }
+    }
+    fun limpiarRegistroTrabajador(){
+        if(cargando == false ){
+            registrosTrabajador = null
         }
     }
 

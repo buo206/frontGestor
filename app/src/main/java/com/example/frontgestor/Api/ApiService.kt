@@ -63,7 +63,7 @@ interface ApiService {
     suspend fun buscarRegistroTrabajador(@Path("idTrabajador") id: Int): Response<List<RegistroTrabajoDTO>>
 
     @GET("registroTrabajo/buscar/{idTrabajo}/{idTrabajador}")
-    suspend fun buscarRegistroTrabajador(@Path("idTrabajo"  ) idTrabajo: Int , @Path("idTrabajador"  ) idTrabajador: Int ): Response<RegistroTrabajoDTO>
+    suspend fun buscarRegistroTrabajo(@Path("idTrabajo"  ) idTrabajo: Int , @Path("idTrabajador"  ) idTrabajador: Int ): Response<RegistroTrabajoDTO>
 
     @GET("registroMaterial/buscarRegistroTodo/{idTrabajador}/{idTrabajo}/{idMaterial}")
     suspend fun buscarRegistroMaterialTodo(@Path("idTrabajador"  ) idTrabajador: Int ,@Path("idTrabajo"  ) idTrabajo: Int  ,@Path("idMaterial"  ) idMaterial: Int ): Response<RegistroMaterialDTO>
@@ -119,7 +119,7 @@ interface ApiService {
     companion object {
         private var apiService: ApiService? = null
 
-        private const val BASE_URL = "http://192.168.0.78:8096/res/"
+        private const val BASE_URL = "http://192.168.0.22:8096/res/"
 
         fun getInstance(): ApiService {
             if (apiService == null) {
